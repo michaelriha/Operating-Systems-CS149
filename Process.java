@@ -14,11 +14,11 @@
 
 public class Process {
 
-	String name;
-	int burstTime;
-	float arrivalTime; 		//between 0 -100
-	int expectedRunTime; 	//between 0-10
-	int priority;   		//between 1 4
+	private String name;
+	private int burstTime;
+	private float arrivalTime; 		//between 0 -100
+	private int expectedRunTime; 	//between 0-10
+	private int priority;   		//between 1 4
 	
 	public float getArrivalTime() {
 		return arrivalTime;
@@ -40,6 +40,9 @@ public class Process {
 		this.priority = priority;
 	}
 
+	public String getName(){
+		return this.name;
+	}
 	public void setName(String name){
 		this.name = name;
 	}

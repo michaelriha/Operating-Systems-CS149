@@ -27,8 +27,10 @@ public class FirstComeFirstServed {
 		while(iter.hasNext()){
 			Process current = iter.next();
 			
-			//TODO Something is wrong with random numbers
-			System.out.println(current.priority);
+			System.out.print("["+current.getName()+"]->");
+			//System.out.print(current.getExpectedRunTime());
+			//System.out.println(current.getArrivalTime());
+			//System.out.println(current.getPriority());
 		}	
 	}
 }

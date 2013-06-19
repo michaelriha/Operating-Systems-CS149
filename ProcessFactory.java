@@ -38,7 +38,6 @@ public class ProcessFactory {
 		//Queue to hold all newly generated process
 		Queue<Process> q = new LinkedList<Process>();
 		
-
 		//rand generate process arrival time
 		Random randomArrival = new Random(100);
 		//randomArrival.setSeed(0);
@@ -58,17 +57,18 @@ public class ProcessFactory {
 			//randomPriority.setSeed(0);
 			
 			//set process information, ie name, time, priority
-			p.arrivalTime = randomArrival.nextFloat()+1; 
-			p.expectedRunTime=randomExpectedTime.nextInt(10)+1;
-			p.priority = randomPriority.nextInt(4)+1;
+			p.setArrivalTime(randomArrival.nextFloat()+1); 
+			p.setExpectedRunTime(randomExpectedTime.nextInt(10)+1);
+			p.setPriority(randomPriority.nextInt(4)+1);
 			
 			//TODO need to fix process name 
-			p.name = names.charAt(start) + Integer.toString(start);
+			String tag = names.charAt(start) + Integer.toString(start);
+			p.setName(tag);
 			
 			//add newly fresh generated process to the queue
-			q.add(new Process());
+			q.add(p);
 			
-			System.out.println(randomArrival.nextFloat());
+		
 		}
 		
 		//get the entire queue filled with fresh backed processes!

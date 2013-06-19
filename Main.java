@@ -21,7 +21,7 @@ public class Main{
 		//queue full of process
 		q = factory.generateProcesses();
 		
-		//in testing phase....
+		//in progress....
 		FirstComeFirstServed fcfs = new FirstComeFirstServed(q);
 		//this will run first come first served simulation
 		fcfs.simulate();
@@ -39,8 +39,8 @@ public class Main{
 		Iterator<Process> iter= q.iterator();
 		
 		while(iter.hasNext()){
-			Process current = iter.next();
-			System.out.print("["+current.arrivalTime + "]->");
+			//Process current = iter.next();
+			//System.out.print("["+current.arrivalTime + "]->");
 		}	
 	}
 
