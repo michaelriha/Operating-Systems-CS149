@@ -34,11 +34,11 @@ public class FirstComeFirstServed extends Scheduler
             stats.addWaitTime(startTime - p.arrivalTime);
             stats.addTurnaroundTime(startTime - p.arrivalTime + p.burstTime);
             stats.addResponseTime(startTime - p.arrivalTime + p.burstTime);
-            stats.addProcess();
+            stats.addProcess();            
             finishTime = startTime + p.burstTime;
             
             // Don't start any processes after 100 time slices
-            if (startTime > 100)
+            if (startTime > 100) 
                 break;
 
             // Create a new process with the calculated start time and add to a new queue
@@ -46,10 +46,12 @@ public class FirstComeFirstServed extends Scheduler
             scheduled.burstTime = p.burstTime;
             scheduled.startTime = startTime;
             scheduled.name = p.name;
-            scheduledQueue.add(scheduled);
-            
+            scheduledQueue.add(scheduled);            
         }
         stats.addQuanta(finishTime); // Add the total quanta to finish all jobs
+        this.printRoundAvgStats();
+        stats.nextRound();
+        
         return scheduledQueue;
     }
 }

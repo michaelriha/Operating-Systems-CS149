@@ -37,7 +37,6 @@ public class Main
             //generate a new process queue for this testing round
             q = new ProcessFactory(PROCESSES_PER_RUN).generateProcesses();
             
-            // BEGIN TESTING CODE
             PriorityQueue<Process> qcopy = new PriorityQueue<>();
             int queueSize = q.size();
             for (int j = 0; j < queueSize; ++j)
@@ -47,8 +46,8 @@ public class Main
             }
             System.out.println();
             q = qcopy;
-            // END TESTING CODE
             
+            // Print data on all of the processes to be 
             
             // Run each scheduling algorithm and show the results
             System.out.print("FCFS: ");
@@ -79,7 +78,7 @@ public class Main
         System.out.println("\nAverage Statistics by Scheduling Algorithm:\n");
 
         System.out.println("First Come First Served");
-        printAvgStats(fcfs);
+        fcfs.printAvgStats();
 //
 //        System.out.println("Preemptive Highest Priority First");
 //        printAvgStats(phpf);
@@ -108,23 +107,11 @@ public class Main
         {
             while (quanta++ < p.startTime) // show idle time
                 System.out.print("_");
+            quanta = p.startTime + p.burstTime;
             
             for (int i = 0; i < p.burstTime; ++i)
                 System.out.print(p.name);
         }
         System.out.println();
-    }
-
-    /**
-     * Print out the average statistics for the given scheduling algorithm
-     * @param s A Scheduler object that has its Stats subclass filled with data
-     */
-    public static void printAvgStats(Scheduler s)
-    {
-        Scheduler.Stats stats = s.getStats();
-        System.out.format("Average turnaround time: %f\n", stats.getAvgTurnaroundTime());
-        System.out.format("Average waiting time: %f\n", stats.getAvgWaitingTime());
-        System.out.format("Average response time: %f\n", stats.getAvgResponseTime());
-        System.out.format("Average throughput per 100 quanta: %f\n", stats.getAvgThroughput());
     }
 }
