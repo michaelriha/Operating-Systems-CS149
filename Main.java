@@ -12,6 +12,8 @@ import java.util.Iterator;
 public class Main
 {
     private static final int SIMULATION_RUNS = 5;
+    private static final int PROCESSES_PER_RUN = 10;
+    
     public static void main(String[] args) 
     {                
         // Create a scheduler for each scheduling algorithm
@@ -26,12 +28,13 @@ public class Main
         Queue<Process> results;
         Queue<Process> q;
 
+        // Test each scheduling algorithm SIMULATION_RUNS times
         for (int i = 0; i < SIMULATION_RUNS; ++i)
         {
             System.out.format("Scheduling Process Queue %d\n", i);
             
             //generate a new process queue for this testing round
-            q = new ProcessFactory(10).generateProcesses();
+            q = new ProcessFactory(PROCESSES_PER_RUN).generateProcesses();
 
             // Run each scheduling algorithm and show the results
             System.out.print("First Come First Served: ");
@@ -58,7 +61,7 @@ public class Main
             results = rr.schedule(q);
             printTimeChart(results);
         }
-
+        
         System.out.println("Average Statistics by Scheduling Algorithm: ");
 
         System.out.println("First Come First Served");
@@ -87,10 +90,8 @@ public class Main
     public static void printTimeChart(Queue<Process> results)
     {
         for (Process p : results)
-        {
             for (int i = 0; i < p.getBurstTime(); ++i)
-            System.out.print(p.getName());
-        }
+                System.out.print(p.getName());
     }
 
     /**
