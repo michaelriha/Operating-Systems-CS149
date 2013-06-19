@@ -1,3 +1,4 @@
+import java.util.PriorityQueue;
 import java.util.Queue;
 
 /**
@@ -14,8 +15,8 @@ public abstract class Scheduler
         private int turnaroundTime;
         private int waitingTime;
         private int responseTime;
-        private int throughput;
         private int processCount;
+        private int quanta;
         
         public double getAvgTurnaroundTime()
         {
@@ -34,7 +35,32 @@ public abstract class Scheduler
         
         public double getAvgThroughput()
         {
-            return throughput / (double) processCount;
+            return 100 * processCount / (double) quanta;
+        }
+        
+        public void addWaitTime(double time)
+        {
+            waitingTime += time;
+        }
+        
+        public void addResponseTime(double time)
+        {
+            responseTime += time;
+        }
+        
+        public void addTurnaroundTime(double time)
+        {
+            turnaroundTime += time;
+        }
+        
+        public void addProcess()
+        {
+            ++processCount;
+        }
+        
+        public void addQuanta(int quantaCount)
+        {
+            quanta += quantaCount;
         }
     }
     
@@ -45,5 +71,5 @@ public abstract class Scheduler
      * selected scheduling algorithm
      * @return A scheduled process queue
      */
-    public abstract Queue<Process> schedule(Queue<Process> q);
+    public abstract Queue<Process> schedule(PriorityQueue<Process> q);
 }
