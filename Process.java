@@ -18,14 +18,11 @@ public class Process implements Comparable
     public int compareTo(Object o)
     {
         Process p = (Process) o;
-        if (this.arrivalTime == p.arrivalTime)
-            return 0;
-        else
-            return this.arrivalTime < p.arrivalTime ? -1 : 1;
+        return this.arrivalTime < p.arrivalTime ? -1 : 1;
     }
 
     char name;
-    double arrivalTime; 	//[0, 100]
+    double arrivalTime; //[0, 100]
     int burstTime;     	//[0, 10]
     int priority;   	//[1, 4]
 
@@ -60,7 +57,8 @@ public class Process implements Comparable
 
     @Override
     public String toString() {
-            return "Process [arrivalTime=" + arrivalTime + ", expectedRunTime="
-                            + burstTime + ", priority=" + priority + "]";
+            return String.format(
+                    "Process %c [arrivalTime=%f, expectedRunTime=%d, priority=%d]",
+                    name, arrivalTime, burstTime, priority);
     }	
 }
