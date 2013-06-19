@@ -1,4 +1,3 @@
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Iterator;
 
@@ -9,26 +8,19 @@ import java.util.Iterator;
  * @version 1.0
  * *****************************************************************/
 
-public class FirstComeFirstServed {
+public class FirstComeFirstServed extends Scheduler
+{
+    @Override
+    public Queue<Process> schedule(Queue<Process> q) 
+    {
+        Iterator<Process> iter = q.iterator();
+        while(iter.hasNext())
+        {
+            Process current = iter.next();
 
-	Queue<Process> q;
-
-	//needs a queue full of fresh processes
-	public FirstComeFirstServed(Queue<Process> process){
-		this.q= process;
-	}
-	
-	/*
-	 * simulate, shows firstcomefirstserved algorithm simulation
-	 * **/
-	public void simulate(){
-		
-		Iterator<Process> iter = q.iterator();
-		while(iter.hasNext()){
-			Process current = iter.next();
-			
-			//TODO Something is wrong with random numbers
-			System.out.println(current.priority);
-		}	
-	}
+            //TODO Something is wrong with random numbers
+            System.out.println(current.priority);
+        }	
+        return null;
+    }
 }
