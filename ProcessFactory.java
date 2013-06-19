@@ -2,13 +2,19 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 
-/*
- * ProcessFactory generates processes
- * @author Manzoor Ahmed, Igor Sorokin
+/********************************************************************************
+ *
+ * ProcessFactory generates processes and puts them in a queue
+ * 
+ * @author Manzoor Ahmed
+ * @author Igor Sorokin
+ * @author 
+ * 
  * @date 06/18/13
  * @version 1.0.0
  *  
- * **/
+ * ******************************************************************************/
+
 public class ProcessFactory {
 
 	private int numbers; // numbers of process we need to generate
@@ -25,10 +31,14 @@ public class ProcessFactory {
 	
 	public Queue<Process> generateProcesses(){
 		//process name
+		
+		//TODO-- Igor, we need to change this to random char instead.
 		String names ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+		
 		//Queue to hold all newly generated process
 		Queue<Process> q = new LinkedList<Process>();
 		
+		//how many processes do we want to create
 		for(int start =0; start!=numbers; start++){
 			
 			//create new process
@@ -52,11 +62,12 @@ public class ProcessFactory {
 			
 			//TODO need to fix process name 
 			p.name = names.charAt(start) + Integer.toString(start);
+			
 			//add newly fresh generated process to the queue
 			q.add(new Process());
 		}
 		
-		//get the entire queue
+		//get the entire queue filled with fresh backed processes!
 		return q;
 	}
 }
