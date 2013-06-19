@@ -1,5 +1,6 @@
 import java.util.Queue;
 import java.util.Iterator;
+import java.util.PriorityQueue;
 
 /******************************************************************************
  * This is main class which runs all the algorithms
@@ -26,54 +27,59 @@ public class Main
 
         // Store results and a randomly generated process queue
         Queue<Process> results;
-        Queue<Process> q;
+        PriorityQueue<Process> q;
         
-        q = new ProcessFactory(PROCESSES_PER_RUN).generateProcesses();
-        
-        // Test that the priority queue is working properly
-        int queueSize = q.size();
-        for (int i = 0; i < queueSize; ++i)
-            System.out.println(q.poll().toString());
-        
-//
-//        // Test each scheduling algorithm SIMULATION_RUNS times
-//        for (int i = 0; i < SIMULATION_RUNS; ++i)
-//        {
-//            System.out.format("Scheduling Process Queue %d\n", i);
-//            
-//            //generate a new process queue for this testing round
-//            q = new ProcessFactory(PROCESSES_PER_RUN).generateProcesses();
-//
-//            // Run each scheduling algorithm and show the results
-//            System.out.print("First Come First Served: ");
-//            results = fcfs.schedule(q);
-//            printTimeChart(results);
-//
-//            System.out.print("Shortest Job First: ");
+        // Test each scheduling algorithm SIMULATION_RUNS times
+        for (int i = 0; i < SIMULATION_RUNS; ++i)
+        {
+            System.out.format("\nScheduling Process Queue %d\n\n", i + 1);
+            
+            //generate a new process queue for this testing round
+            q = new ProcessFactory(PROCESSES_PER_RUN).generateProcesses();
+            
+            // BEGIN TESTING CODE
+            PriorityQueue<Process> qcopy = new PriorityQueue<>();
+            int queueSize = q.size();
+            for (int j = 0; j < queueSize; ++j)
+            {
+                System.out.println(q.peek().toString());
+                qcopy.add(q.poll());
+            }
+            System.out.println();
+            q = qcopy;
+            // END TESTING CODE
+            
+            
+            // Run each scheduling algorithm and show the results
+            System.out.print("FCFS: ");
+            results = fcfs.schedule(q);
+            printTimeChart(results);
+
+//            System.out.print("SJF: ");
 //            results = sjf.schedule(q);
 //            printTimeChart(results);
 //
-//            System.out.print("Nonpreemptive Highest Priority First: ");
+//            System.out.print("Nonpreemptive HPF: ");
 //            results = nhpf.schedule(q);
 //            printTimeChart(results);
 //
-//            System.out.print("Preemptive Highest Priority First: ");
+//            System.out.print("Preemptive HPF: ");
 //            results = phpf.schedule(q);
 //            printTimeChart(results);
 //
-//            System.out.print("Shortest Runtime: ");
+//            System.out.print("SRT: ");
 //            results = srt.schedule(q);
 //            printTimeChart(results);
 //
-//            System.out.print("Round Robin: ");
+//            System.out.print("RR: ");
 //            results = rr.schedule(q);
 //            printTimeChart(results);
-//        }
-//        
-//        System.out.println("Average Statistics by Scheduling Algorithm: ");
-//
-//        System.out.println("First Come First Served");
-//        printAvgStats(fcfs);
+        }
+        
+        System.out.println("\nAverage Statistics by Scheduling Algorithm:\n");
+
+        System.out.println("First Come First Served");
+        printAvgStats(fcfs);
 //
 //        System.out.println("Preemptive Highest Priority First");
 //        printAvgStats(phpf);
@@ -95,11 +101,18 @@ public class Main
      * Print a "time chart" of the results, e.g. ABCDABCD...
      * @param results A list of Processes that have been scheduled
      */
-    public static void printTimeChart(Queue<Process> results)
+    public static void printTimeChart(Queue<Process> q)
     {
-        for (Process p : results)
-            for (int i = 0; i < p.getBurstTime(); ++i)
-                System.out.print(p.getName());
+        int quanta = 0;
+        for (Process p : q)
+        {
+            while (quanta++ < p.startTime) // show idle time
+                System.out.print("_");
+            
+            for (int i = 0; i < p.burstTime; ++i)
+                System.out.print(p.name);
+        }
+        System.out.println();
     }
 
     /**
@@ -112,6 +125,6 @@ public class Main
         System.out.format("Average turnaround time: %f\n", stats.getAvgTurnaroundTime());
         System.out.format("Average waiting time: %f\n", stats.getAvgWaitingTime());
         System.out.format("Average response time: %f\n", stats.getAvgResponseTime());
-        System.out.format("Average throughput: %f\n", stats.getAvgThroughput());
+        System.out.format("Average throughput per 100 quanta: %f\n", stats.getAvgThroughput());
     }
 }
