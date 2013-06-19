@@ -6,7 +6,7 @@
  * 
  * @author Manzoor Ahmed
  * @author Igor Sorokin
- * @author 
+ * @author Michael Riha  
  * 
  * @version 1.0
  * @data 06/17/2013
@@ -14,11 +14,11 @@
 
 public class Process {
 
-	private String name;
-	private int burstTime;
-	private float arrivalTime; 		//between 0 -100
-	private int expectedRunTime; 	//between 0-10
-	private int priority;   		//between 1 4
+	private String name;			//process name
+	private int burstTime;          //process burstTime
+	private float arrivalTime; 		//process arrival time between 0 -100
+	private int expectedRunTime; 	//process run time  between 0-10
+	private int priority;   		//process priority between 1 4
 	
 	public float getArrivalTime() {
 		return arrivalTime;
@@ -45,6 +45,14 @@ public class Process {
 	}
 	public void setName(String name){
 		this.name = name;
+	}
+	
+	public int getBurstTime(){
+		return this.burstTime;
+	}
+	
+	public void setBurstTime(int time){
+		this.burstTime = time;
 	}
 	
 	@Override
