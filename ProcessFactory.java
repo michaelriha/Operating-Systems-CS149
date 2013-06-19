@@ -28,12 +28,12 @@ public class ProcessFactory
      * Create processCount random processes and add to a priority queue
      * @return q A PriorityQueue ordered with lowest arrival time first
      **/
-    public Queue<Process> generateProcesses()
+    public PriorityQueue<Process> generateProcesses()
     {
         String names ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
         // Use a priority queue to order processes by arrival time (IMPORTANT!!)
-        Queue<Process> q = new PriorityQueue<>();
+        PriorityQueue<Process> q = new PriorityQueue<>();
 
         // get random arrival, expected time, and priority
         Random randomArrival = new Random();
