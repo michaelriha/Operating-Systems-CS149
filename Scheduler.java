@@ -129,6 +129,24 @@ public abstract class Scheduler
     }
     
     /**
+     * Print a "time chart" of the results, e.g. ABCDABCD...
+     * @param results A list of Processes that have been scheduled
+     */
+    public static void printTimeChart(Queue<Process> q)
+    {
+        int quanta = 0;
+        for (Process p : q)
+        {
+            while (quanta++ < p.startTime) // show idle time
+                System.out.print("_");
+            quanta = p.startTime + p.burstTime;
+            
+            for (int i = 0; i < p.burstTime; ++i)
+                System.out.print(p.name);
+        }
+        System.out.println();
+    }
+    /**
      * Go through the process queue and create a new process queue using the 
      * selected scheduling algorithm
      * @return A scheduled process queue

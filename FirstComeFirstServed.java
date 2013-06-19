@@ -49,7 +49,8 @@ public class FirstComeFirstServed extends Scheduler
             scheduledQueue.add(scheduled);            
         }
         stats.addQuanta(finishTime); // Add the total quanta to finish all jobs
-        this.printRoundAvgStats();
+        printTimeChart(scheduledQueue);
+        printRoundAvgStats();
         stats.nextRound();
         
         return scheduledQueue;

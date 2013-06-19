@@ -13,7 +13,7 @@ import java.util.PriorityQueue;
 public class Main
 {
     private static final int SIMULATION_RUNS = 5;
-    private static final int PROCESSES_PER_RUN = 10;
+    private static final int PROCESSES_PER_RUN = 20;
     
     public static void main(String[] args) 
     {                
@@ -37,6 +37,7 @@ public class Main
             //generate a new process queue for this testing round
             q = new ProcessFactory(PROCESSES_PER_RUN).generateProcesses();
             
+            // Print the process list by ascending arrival time
             PriorityQueue<Process> qcopy = new PriorityQueue<>();
             int queueSize = q.size();
             for (int j = 0; j < queueSize; ++j)
@@ -47,32 +48,24 @@ public class Main
             System.out.println();
             q = qcopy;
             
-            // Print data on all of the processes to be 
-            
             // Run each scheduling algorithm and show the results
             System.out.print("FCFS: ");
-            results = fcfs.schedule(q);
-            printTimeChart(results);
-
+            fcfs.schedule(q);
+            
 //            System.out.print("SJF: ");
-//            results = sjf.schedule(q);
-//            printTimeChart(results);
-//
+//            sjf.schedule(q);
+//            
 //            System.out.print("Nonpreemptive HPF: ");
-//            results = nhpf.schedule(q);
-//            printTimeChart(results);
-//
+//            nhpf.schedule(q);
+//            
 //            System.out.print("Preemptive HPF: ");
-//            results = phpf.schedule(q);
-//            printTimeChart(results);
-//
+//            phpf.schedule(q);
+
 //            System.out.print("SRT: ");
-//            results = srt.schedule(q);
-//            printTimeChart(results);
-//
+//            srt.schedule(q);
+
 //            System.out.print("RR: ");
-//            results = rr.schedule(q);
-//            printTimeChart(results);
+//            rr.schedule(q);
         }
         
         System.out.println("\nAverage Statistics by Scheduling Algorithm:\n");
@@ -94,24 +87,5 @@ public class Main
 //
 //        System.out.println("Round Robin");
 //        printAvgStats(rr);
-    }
-
-    /**
-     * Print a "time chart" of the results, e.g. ABCDABCD...
-     * @param results A list of Processes that have been scheduled
-     */
-    public static void printTimeChart(Queue<Process> q)
-    {
-        int quanta = 0;
-        for (Process p : q)
-        {
-            while (quanta++ < p.startTime) // show idle time
-                System.out.print("_");
-            quanta = p.startTime + p.burstTime;
-            
-            for (int i = 0; i < p.burstTime; ++i)
-                System.out.print(p.name);
-        }
-        System.out.println();
     }
 }
