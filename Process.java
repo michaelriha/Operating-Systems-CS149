@@ -1,21 +1,24 @@
 
-/**
+/*************************************************************************
+ * 
  * Process contains process information such as process arrival time
- * expected run time and priority. 
+ * expected run time, burst time and priority. 
  * 
  * @author Manzoor Ahmed
  * @author Igor Sorokin
+ * @author 
  * 
  * @version 1.0
  * @data 06/17/2013
- */
+ ************************************************************************/
 
 public class Process {
 
 	String name;
-	float arrivalTime; 		//0 -100
-	int expectedRunTime; 	// 0-10
-	int priority;   		//1 4
+	int burstTime;
+	float arrivalTime; 		//between 0 -100
+	int expectedRunTime; 	//between 0-10
+	int priority;   		//between 1 4
 	
 	public float getArrivalTime() {
 		return arrivalTime;
