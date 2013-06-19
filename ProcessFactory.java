@@ -17,48 +17,38 @@ import java.util.Random;
 
 public class ProcessFactory
 {
-    private int numbers; // numbers of process we need to generate
-
-    public ProcessFactory(int numbers)
+    private int processCount;
+    
+    public ProcessFactory(int processCount)
     {
-        this.numbers = numbers;
+        this.processCount = processCount;
     }
 
     /*
-     * generateProcesses creates process with name, arrival time,
-     * expected run time, priority and shoves them in queue.
-     * @return q, queue full of processes
-     * **/
-
+     * Create processCount random processes and add to a priority queue
+     * @return q A PriorityQueue ordered with lowest arrival time first
+     **/
     public Queue<Process> generateProcesses()
     {
-        //TODO-- Igor, we need to change this to random char instead.
-        // ^^ The process names do not have to be random. - Michael
         String names ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-        // Use a priority queue to order processes by arrival time (IMPORTANT!)
+        // Use a priority queue to order processes by arrival time (IMPORTANT!!)
         Queue<Process> q = new PriorityQueue<>();
 
         // get random arrival, expected time, and priority
-        Random randomArrival = new Random(100);
-        Random randomExpectedTime = new Random(10);
-        Random randomPriority = new Random(4);
-        //randomArrival.setSeed(0);
-        //randomExpectedTime.setSeed(0);		
+        Random randomArrival = new Random();
+        Random randomPriority = new Random();        
+        Random randomExpectedTime = new Random();
 
-        for(int start = 0; start != numbers; ++start)
+        // Generate new processes and add to the process queue 
+        for(int i = 0; i != processCount; ++i)
         {		
             Process p = new Process();
-
-            p.arrivalTime = randomArrival.nextFloat()+1; 
-            p.burstTime = randomExpectedTime.nextInt(10)+1;
-            p.priority = randomPriority.nextInt(4)+1;
-
-            //TODO need to fix process name -- Should just be a letter 
-            p.name = names.charAt(start);
+            p.arrivalTime = randomArrival.nextFloat() * 100; 
+            p.burstTime = randomExpectedTime.nextInt(10) + 1;
+            p.priority = randomPriority.nextInt(4) + 1;
+            p.name = names.charAt(i);
             q.add(p);
-
-            System.out.println(randomArrival.nextFloat());
         }
         return q;
     }
