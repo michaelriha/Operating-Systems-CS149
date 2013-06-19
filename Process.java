@@ -6,47 +6,61 @@
  * 
  * @author Manzoor Ahmed
  * @author Igor Sorokin
- * @author 
+ * @author Michael Riha
  * 
  * @version 1.0
  * @data 06/17/2013
  ************************************************************************/
 
-public class Process {
+public class Process implements Comparable
+{
+    /* Implement comparable so that we can put these in a priority queue */
+    public int compareTo(Object o)
+    {
+        Process p = (Process) o;
+        if (this.arrivalTime == p.arrivalTime)
+            return 0;
+        else
+            return this.arrivalTime < p.arrivalTime ? -1 : 1;
+    }
 
-	String name;
-	int burstTime;
-	float arrivalTime; 		//between 0 -100
-	int expectedRunTime; 	//between 0-10
-	int priority;   		//between 1 4
-	
-	public float getArrivalTime() {
-		return arrivalTime;
-	}
-	
-	public void setArrivalTime(float arrivalTime) {
-		this.arrivalTime = arrivalTime;
-	}
-	public int getExpectedRunTime() {
-		return expectedRunTime;
-	}
-	public void setExpectedRunTime(int expectedRunTime) {
-		this.expectedRunTime = expectedRunTime;
-	}
-	public int getPriority() {
-		return priority;
-	}
-	public void setPriority(int priority) {
-		this.priority = priority;
-	}
+    char name;
+    double arrivalTime; 	//[0, 100]
+    int burstTime;     	//[0, 10]
+    int priority;   	//[1, 4]
 
-	public void setName(String name){
-		this.name = name;
-	}
-	
-	@Override
-	public String toString() {
-		return "Process [arrivalTime=" + arrivalTime + ", expectedRunTime="
-				+ expectedRunTime + ", priority=" + priority + "]";
-	}	
+    public double getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(double arrivalTime) {
+        this.arrivalTime = arrivalTime;
+    }
+    public int getBurstTime() {
+        return burstTime;
+    }
+    public void setBurstTime(int burstTime) {
+        this.burstTime = burstTime;
+    }
+    public int getPriority() {
+        return priority;
+    }
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public void setName(char name){
+        this.name = name;
+    }
+
+    public char getName()
+    {
+        return this.name;
+    }
+
+    @Override
+    public String toString() {
+            return "Process [arrivalTime=" + arrivalTime + ", expectedRunTime="
+                            + burstTime + ", priority=" + priority + "]";
+    }	
 }
