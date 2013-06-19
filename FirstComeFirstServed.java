@@ -19,13 +19,16 @@ public class FirstComeFirstServed {
 	}
 	
 	/*
-	 * simulate, shows firstcomefirstserved algorithm
+	 * simulate, shows firstcomefirstserved algorithm simulation
 	 * **/
 	public void simulate(){
+		
 		Iterator<Process> iter = q.iterator();
 		while(iter.hasNext()){
 			Process current = iter.next();
-			//TODO
+			
+			//TODO Something is wrong with random numbers
+			System.out.println(current.priority);
 		}	
 	}
 }
