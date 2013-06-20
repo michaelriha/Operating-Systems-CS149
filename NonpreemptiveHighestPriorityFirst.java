@@ -59,6 +59,25 @@ public class NonpreemptiveHighestPriorityFirst extends Scheduler
             scheduled.setName(p.getName());
             scheduledQueue.add(scheduled);            
         }
+        // Get any remaining values out of the ready queue
+        while (!readyQueue.isEmpty())
+        {
+            p = readyQueue.poll();           
+            startTime = Math.max((int) Math.ceil(p.getArrivalTime()), finishTime);
+            finishTime = startTime + p.getBurstTime();            
+            stats.addWaitTime(startTime - p.getArrivalTime());
+            stats.addTurnaroundTime(startTime - p.getArrivalTime() + p.getBurstTime());
+            stats.addResponseTime(startTime - p.getArrivalTime() + p.getBurstTime());
+            stats.addProcess();            
+            if (startTime > 100) 
+                break;
+            scheduled = new Process();
+            scheduled.setBurstTime(p.getBurstTime());
+            scheduled.setStartTime(startTime);
+            scheduled.setName(p.getName());
+            scheduledQueue.add(scheduled);             
+        }
+        
         stats.addQuanta(finishTime); // Add the total quanta to finish all jobs
         printTimeChart(scheduledQueue);
         printRoundAvgStats();
