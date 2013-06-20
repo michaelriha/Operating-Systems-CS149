@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.Iterator;
 import java.util.PriorityQueue;
@@ -13,47 +14,43 @@ import java.util.PriorityQueue;
 public class Main
 {
     private static final int SIMULATION_RUNS = 5;
-    private static final int PROCESSES_PER_RUN = 20;
+    private static final int PROCESSES_PER_RUN = 26;
+    private static final int ALGORITHM_COUNT = 6;
     
-    public static void main(String[] args) 
+    public static void main(String[] args) throws CloneNotSupportedException 
     {                
         // Create a scheduler for each scheduling algorithm
         Scheduler fcfs = new FirstComeFirstServed();
-        Scheduler phpf = new PreemptiveHighestPriorityFirst();
-        Scheduler nhpf = new NonpreemptiveHighestPriorityFirst();
+        //Scheduler phpf = new PreemptiveHighestPriorityFirst();
+        //Scheduler nhpf = new NonpreemptiveHighestPriorityFirst();
         Scheduler sjf = new ShortestJobFirst();
-        Scheduler srt = new ShortestRemainingTime();
-        Scheduler rr = new RoundRobin();
+        //Scheduler srt = new ShortestRemainingTime();
+        //Scheduler rr = new RoundRobin();
 
-        // Store results and a randomly generated process queue
-        Queue<Process> results;
-        PriorityQueue<Process> q;
+        // Holld duplicated process queues for each algorithm to use
+        PriorityQueue<Process>[] q = new PriorityQueue[ALGORITHM_COUNT + 1];
+        q = (PriorityQueue<Process>[]) q;
         
         // Test each scheduling algorithm SIMULATION_RUNS times
         for (int i = 0; i < SIMULATION_RUNS; ++i)
         {
             System.out.format("\nScheduling Process Queue %d\n\n", i + 1);
             
-            //generate a new process queue for this testing round
-            q = ProcessFactory.generateProcesses(PROCESSES_PER_RUN);
+            //generate a new process queue for this testing round then duplicate it
+            q[0] = ProcessFactory.generateProcesses(PROCESSES_PER_RUN);
+            for (int j = 1; j < ALGORITHM_COUNT + 1; ++j)
+                q[j] = copyQueue(q[0]);
             
-            // Print the process list by ascending arrival time
-            PriorityQueue<Process> qcopy = new PriorityQueue<>();
-            int queueSize = q.size();
-            for (int j = 0; j < queueSize; ++j)
-            {
-                System.out.println(q.peek().toString());
-                qcopy.add(q.poll());
-            }
-            System.out.println();
-            q = qcopy;
-            
+            // Print the process list by ascending arrival time   
+            while (!q[ALGORITHM_COUNT].isEmpty())
+                System.out.println(q[ALGORITHM_COUNT].poll());
+                        
             // Run each scheduling algorithm and show the results
-            System.out.print("FCFS: ");
-            fcfs.schedule(q);
+            System.out.print("\nFCFS: ");
+            fcfs.schedule(q[0]);
             
-//            System.out.print("SJF: ");
-//            sjf.schedule(q);
+            System.out.print("\nSJF: ");
+            sjf.schedule(q[1]);
 //            
 //            System.out.print("Nonpreemptive HPF: ");
 //            nhpf.schedule(q);
@@ -68,10 +65,10 @@ public class Main
 //            rr.schedule(q);
         }
         
-        System.out.println("\nAverage Statistics by Scheduling Algorithm:\n");
+       // System.out.println("\nAverage Statistics by Scheduling Algorithm:\n");
 
-        System.out.println("First Come First Served");
-        fcfs.printAvgStats();
+        //System.out.println("First Come First Served");
+       // fcfs.printAvgStats();
 //
 //        System.out.println("Preemptive Highest Priority First");
 //        printAvgStats(phpf);
@@ -87,5 +84,19 @@ public class Main
 //
 //        System.out.println("Round Robin");
 //        printAvgStats(rr);
+    }
+    
+    private static PriorityQueue<Process> copyQueue(PriorityQueue<Process> q) throws CloneNotSupportedException
+    {        
+            PriorityQueue<Process> qcopy = new PriorityQueue<>();
+            ArrayList<Process> qoriginal = new ArrayList<>();
+            while (!q.isEmpty())
+            {
+                Process p = q.poll();
+                qcopy.add((Process) p.clone());
+                qoriginal.add(p);
+            }
+            q.addAll(qoriginal);
+            return qcopy;
     }
 }
