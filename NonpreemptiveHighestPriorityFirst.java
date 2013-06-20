@@ -22,7 +22,7 @@ public class NonpreemptiveHighestPriorityFirst extends Scheduler
             public int compare(Object o1, Object o2) {
                 Process p1 = (Process) o1;
                 Process p2 = (Process) o2;
-                if (p1.getBurstTime() == p2.getBurstTime())
+                if (p1.getPriority() == p2.getPriority())
                     return p1.getArrivalTime() < p2.getArrivalTime() ? -1 : 1;
                 else
                     return p1.getPriority() < p2.getPriority() ? -1 : 1;
