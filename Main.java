@@ -22,7 +22,7 @@ public class Main
         // Create a scheduler for each scheduling algorithm
         Scheduler fcfs = new FirstComeFirstServed();
         //Scheduler phpf = new PreemptiveHighestPriorityFirst();
-        //Scheduler nhpf = new NonpreemptiveHighestPriorityFirst();
+        Scheduler nhpf = new NonpreemptiveHighestPriorityFirst();
         Scheduler sjf = new ShortestJobFirst();
         //Scheduler srt = new ShortestRemainingTime();
         //Scheduler rr = new RoundRobin();
@@ -49,19 +49,19 @@ public class Main
             System.out.print("\nFCFS: ");
             fcfs.schedule(q[0]);
             
-            System.out.print("\nSJF: ");
+            System.out.print("\nSJF:  ");
             sjf.schedule(q[1]);
-//            
-//            System.out.print("Nonpreemptive HPF: ");
-//            nhpf.schedule(q);
-//            
-//            System.out.print("Preemptive HPF: ");
+            
+            System.out.print("\nNHPF: ");
+            nhpf.schedule(q[2]);
+            
+//            System.out.print("\nPHPF: ");
 //            phpf.schedule(q);
 
-//            System.out.print("SRT: ");
+//            System.out.print("\nSRT:  ");
 //            srt.schedule(q);
 
-//            System.out.print("RR: ");
+//            System.out.print("\nRR:   ");
 //            rr.schedule(q);
         }
         
