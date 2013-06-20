@@ -12,13 +12,26 @@
  * @data 06/17/2013
  ************************************************************************/
 
-public class Process implements Comparable
+public class Process implements Cloneable, Comparable
 {   
+    @Override
     /* Implement comparable so that we can put these in a priority queue */
     public int compareTo(Object o)
     {
         Process p = (Process) o;
         return this.arrivalTime < p.arrivalTime ? -1 : 1;
+    }
+    
+    @Override 
+    public Object clone() throws CloneNotSupportedException 
+    {
+        Process cloned = new Process();
+        cloned.name = this.name;
+        cloned.arrivalTime = this.arrivalTime;
+        cloned.priority = this.priority;
+        cloned.burstTime = this.burstTime;
+        cloned.startTime = this.startTime;
+        return cloned;
     }
 
     private char name;
