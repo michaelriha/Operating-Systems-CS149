@@ -111,10 +111,10 @@ public abstract class Scheduler
      */
     public void printAvgStats()
     {
-        System.out.format("\nAverage turnaround time: %f\n", stats.getAvgTurnaroundTime());
-        System.out.format("Average waiting time: %f\n", stats.getAvgWaitingTime());
-        System.out.format("Average response time: %f\n", stats.getAvgResponseTime());
-        System.out.format("Average throughput per 100 quanta: %f\n", stats.getAvgThroughput());
+        System.out.format("\nTurnaround time: %f\n", stats.getAvgTurnaroundTime());
+        System.out.format("Waiting time: %f\n", stats.getAvgWaitingTime());
+        System.out.format("Response time: %f\n", stats.getAvgResponseTime());
+        System.out.format("Throughput per 100 quanta: %f\n", stats.getAvgThroughput());
     }
     
     /**
@@ -122,10 +122,10 @@ public abstract class Scheduler
      */
     public void printRoundAvgStats()
     {
-        System.out.format("\nAverage turnaround time: %f\n", stats.getRoundAvgTurnaroundTime());
-        System.out.format("Average waiting time: %f\n", stats.getRoundAvgWaitingTime());
-        System.out.format("Average response time: %f\n", stats.getRoundAvgResponseTime());
-        System.out.format("Average throughput per 100 quanta: %f\n", stats.getRoundAvgThroughput());
+        System.out.format("\nTurnaround time: %f\n", stats.getRoundAvgTurnaroundTime());
+        System.out.format("Waiting time: %f\n", stats.getRoundAvgWaitingTime());
+        System.out.format("Response time: %f\n", stats.getRoundAvgResponseTime());
+        System.out.format("Throughput per 100 quanta: %f\n", stats.getRoundAvgThroughput());
     }
     
     /**
@@ -137,12 +137,12 @@ public abstract class Scheduler
         int quanta = 0;
         for (Process p : q)
         {
-            while (quanta++ < p.startTime) // show idle time
+            while (quanta++ < p.getStartTime()) // show idle time
                 System.out.print("_");
-            quanta = p.startTime + p.burstTime;
+            quanta = p.getStartTime() + p.getBurstTime();
             
-            for (int i = 0; i < p.burstTime; ++i)
-                System.out.print(p.name);
+            for (int i = 0; i < p.getBurstTime(); ++i)
+                System.out.print(p.getName());
         }
         System.out.println();
     }

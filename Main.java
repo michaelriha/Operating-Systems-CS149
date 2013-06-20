@@ -35,7 +35,7 @@ public class Main
             System.out.format("\nScheduling Process Queue %d\n\n", i + 1);
             
             //generate a new process queue for this testing round
-            q = new ProcessFactory(PROCESSES_PER_RUN).generateProcesses();
+            q = ProcessFactory.generateProcesses(PROCESSES_PER_RUN);
             
             // Print the process list by ascending arrival time
             PriorityQueue<Process> qcopy = new PriorityQueue<>();

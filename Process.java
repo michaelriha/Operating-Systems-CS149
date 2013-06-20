@@ -13,7 +13,7 @@
  ************************************************************************/
 
 public class Process implements Comparable
-{
+{   
     /* Implement comparable so that we can put these in a priority queue */
     public int compareTo(Object o)
     {
@@ -21,44 +21,29 @@ public class Process implements Comparable
         return this.arrivalTime < p.arrivalTime ? -1 : 1;
     }
 
-    char name;
-    double arrivalTime; //[0, 100]
-    int burstTime;     	//[0, 10]
-    int priority;   	//[1, 4]
+    private char name;
+    private double arrivalTime; //[0, 100] Only applies to unscheduled processes
+    private int priority;   	//[1, 4]   Only applies to unscheduled processes
+    private int burstTime;     	//[0, 10]
+    private int startTime;      //[0, 100] Only applies to already scheduled processes
 
-    public double getArrivalTime() {
-        return arrivalTime;
-    }
-
-    public void setArrivalTime(double arrivalTime) {
-        this.arrivalTime = arrivalTime;
-    }
-    public int getBurstTime() {
-        return burstTime;
-    }
-    public void setBurstTime(int burstTime) {
-        this.burstTime = burstTime;
-    }
-    public int getPriority() {
-        return priority;
-    }
-    public void setPriority(int priority) {
-        this.priority = priority;
-    }
-
-    public void setName(char name){
-        this.name = name;
-    }
-
-    public char getName()
-    {
-        return this.name;
-    }
+    public double getArrivalTime() { return arrivalTime; }
+    public int getBurstTime() { return burstTime; }
+    public int getPriority() { return priority; }
+    public int getStartTime() { return startTime; }
+    public char getName() { return this.name; }
+    
+    public void setArrivalTime(double arrivalTime) { this.arrivalTime = arrivalTime; }
+    public void setBurstTime(int burstTime) { this.burstTime = burstTime; }
+    public void setPriority(int priority) { this.priority = priority; }
+    public void setStartTime(int startTime) { this.startTime = startTime; }
+    public void setName(char name){ this.name = name; }    
 
     @Override
-    public String toString() {
-            return String.format(
-                    "Process %c [arrivalTime=%f, expectedRunTime=%d, priority=%d]",
-                    name, arrivalTime, burstTime, priority);
+    public String toString() 
+    {
+        return String.format(
+                "Process %c [arrivalTime=%f, expectedRunTime=%d, priority=%d]",
+                name, arrivalTime, burstTime, priority);
     }	
 }

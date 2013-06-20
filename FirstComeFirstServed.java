@@ -28,14 +28,14 @@ public class FirstComeFirstServed extends Scheduler
             p = q.poll(); // MUST BE POLLED SEPARATELY for PriorityQueue to update
                           // for (Process p : q) will give the wrong order!
             
-            startTime = Math.max((int) Math.ceil(p.arrivalTime), finishTime);            
+            startTime = Math.max((int) Math.ceil(p.getArrivalTime()), finishTime);            
             
             // Record the statistics for this process
-            stats.addWaitTime(startTime - p.arrivalTime);
-            stats.addTurnaroundTime(startTime - p.arrivalTime + p.burstTime);
-            stats.addResponseTime(startTime - p.arrivalTime + p.burstTime);
+            stats.addWaitTime(startTime - p.getArrivalTime());
+            stats.addTurnaroundTime(startTime - p.getArrivalTime() + p.getBurstTime());
+            stats.addResponseTime(startTime - p.getArrivalTime() + p.getBurstTime());
             stats.addProcess();            
-            finishTime = startTime + p.burstTime;
+            finishTime = startTime + p.getBurstTime();
             
             // Don't start any processes after 100 time slices
             if (startTime > 100) 
@@ -43,9 +43,9 @@ public class FirstComeFirstServed extends Scheduler
 
             // Create a new process with the calculated start time and add to a new queue
             scheduled = new Process();
-            scheduled.burstTime = p.burstTime;
-            scheduled.startTime = startTime;
-            scheduled.name = p.name;
+            scheduled.setBurstTime(p.getBurstTime());
+            scheduled.setStartTime(startTime);
+            scheduled.setName(p.getName());
             scheduledQueue.add(scheduled);            
         }
         stats.addQuanta(finishTime); // Add the total quanta to finish all jobs

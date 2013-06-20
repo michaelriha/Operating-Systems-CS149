@@ -17,18 +17,11 @@ import java.util.Random;
 
 public class ProcessFactory
 {
-    private int processCount;
-    
-    public ProcessFactory(int processCount)
-    {
-        this.processCount = processCount;
-    }
-
     /*
      * Create processCount random processes and add to a priority queue
      * @return q A PriorityQueue ordered with lowest arrival time first
      **/
-    public PriorityQueue<Process> generateProcesses()
+    public static PriorityQueue<Process> generateProcesses(int processCount)
     {
         String names ="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -44,10 +37,10 @@ public class ProcessFactory
         for(int i = 0; i != processCount; ++i)
         {		
             Process p = new Process();
-            p.arrivalTime = randomArrival.nextFloat() * 100; 
-            p.burstTime = randomExpectedTime.nextInt(10) + 1;
-            p.priority = randomPriority.nextInt(4) + 1;
-            p.name = names.charAt(i);
+            p.setArrivalTime(randomArrival.nextFloat() * 100); 
+            p.setBurstTime(randomExpectedTime.nextInt(10) + 1);
+            p.setPriority(randomPriority.nextInt(4) + 1);
+            p.setName(names.charAt(i));
             q.add(p);
         }
         return q;
