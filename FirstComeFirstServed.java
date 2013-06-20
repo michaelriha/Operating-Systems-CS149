@@ -29,17 +29,17 @@ public class FirstComeFirstServed extends Scheduler
                           // for (Process p : q) will give the wrong order!
             
             startTime = Math.max((int) Math.ceil(p.getArrivalTime()), finishTime);            
+            finishTime = startTime + p.getBurstTime();
+            
+            // Don't start any processes after 100 time slices
+            if (startTime > 100) 
+                break;
             
             // Record the statistics for this process
             stats.addWaitTime(startTime - p.getArrivalTime());
             stats.addTurnaroundTime(startTime - p.getArrivalTime() + p.getBurstTime());
             stats.addResponseTime(startTime - p.getArrivalTime() + p.getBurstTime());
             stats.addProcess();            
-            finishTime = startTime + p.getBurstTime();
-            
-            // Don't start any processes after 100 time slices
-            if (startTime > 100) 
-                break;
 
             // Create a new process with the calculated start time and add to a new queue
             scheduled = new Process();

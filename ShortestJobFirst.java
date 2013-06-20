@@ -30,15 +30,16 @@ public class ShortestJobFirst extends Scheduler
         });
         
         while (!q.isEmpty())
-        {
-            if (readyQueue.isEmpty())
-                p = q.poll();
-            else
-                p = readyQueue.poll();
+        {            
+            p = readyQueue.isEmpty() ? q.poll() : readyQueue.poll();
                        
             startTime = Math.max((int) Math.ceil(p.getArrivalTime()), finishTime);
             finishTime = startTime + p.getBurstTime();
             
+            // Don't start any processes after 100 time slices
+            if (startTime > 100) 
+                break;
+            // add processes that have arrived by now to the ready queue
             while (q.peek() != null && Math.ceil(q.peek().getArrivalTime()) < finishTime)
                 readyQueue.add(q.poll());
             
@@ -46,11 +47,7 @@ public class ShortestJobFirst extends Scheduler
             stats.addWaitTime(startTime - p.getArrivalTime());
             stats.addTurnaroundTime(startTime - p.getArrivalTime() + p.getBurstTime());
             stats.addResponseTime(startTime - p.getArrivalTime() + p.getBurstTime());
-            stats.addProcess();            
-            
-            // Don't start any processes after 100 time slices
-            if (startTime > 100) 
-                break;
+            stats.addProcess();           
 
             // Create a new process with the calculated start time and add to a new queue
             scheduled = new Process();
@@ -63,14 +60,14 @@ public class ShortestJobFirst extends Scheduler
         while (!readyQueue.isEmpty())
         {
             p = readyQueue.poll();           
-            startTime = Math.max((int) Math.ceil(p.getArrivalTime()), finishTime);
+            startTime = Math.max((int) Math.ceil(p.getArrivalTime()), finishTime);      
+            if (startTime > 100) 
+                break;
             finishTime = startTime + p.getBurstTime();            
             stats.addWaitTime(startTime - p.getArrivalTime());
             stats.addTurnaroundTime(startTime - p.getArrivalTime() + p.getBurstTime());
             stats.addResponseTime(startTime - p.getArrivalTime() + p.getBurstTime());
-            stats.addProcess();            
-            if (startTime > 100) 
-                break;
+            stats.addProcess();      
             scheduled = new Process();
             scheduled.setBurstTime(p.getBurstTime());
             scheduled.setStartTime(startTime);
