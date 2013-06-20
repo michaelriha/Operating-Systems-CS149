@@ -25,7 +25,7 @@ public class Main
         Scheduler nhpf = new NonpreemptiveHighestPriorityFirst();
         Scheduler sjf = new ShortestJobFirst();
         //Scheduler srt = new ShortestRemainingTime();
-        //Scheduler rr = new RoundRobin();
+        Scheduler rr = new RoundRobin();
 
         // Holld duplicated process queues for each algorithm to use
         PriorityQueue<Process>[] q = new PriorityQueue[ALGORITHM_COUNT + 1];
@@ -60,9 +60,8 @@ public class Main
 
 //            System.out.print("\nSRT:  ");
 //            srt.schedule(q);
-
-//            System.out.print("\nRR:   ");
-//            rr.schedule(q);
+            System.out.print("\nRR:   ");
+            rr.schedule(q[3]);
         }
         
        // System.out.println("\nAverage Statistics by Scheduling Algorithm:\n");
