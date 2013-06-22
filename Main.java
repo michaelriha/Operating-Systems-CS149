@@ -14,7 +14,7 @@ import java.util.PriorityQueue;
 public class Main
 {
     private static final int SIMULATION_RUNS = 5;
-    private static final int PROCESSES_PER_RUN = 20;
+    private static final int PROCESSES_PER_RUN = 15;
     private static final int ALGORITHM_COUNT = 6;
     
     public static void main(String[] args) throws CloneNotSupportedException 
@@ -22,10 +22,10 @@ public class Main
         // Create a scheduler for each scheduling algorithm
         Scheduler fcfs = new FirstComeFirstServed();
         //Scheduler phpf = new PreemptiveHighestPriorityFirst();
-        Scheduler nhpf = new NonpreemptiveHighestPriorityFirst();
+        Scheduler nhpf = new NonpreemptiveHighestPriorityFirstNoAging();
+        Scheduler rrna = new NonpreemptiveHighestPriorityFirstNoAging();
         Scheduler sjf = new ShortestJobFirst();
         //Scheduler srt = new ShortestRemainingTime();
-        Scheduler rrna = new RoundRobinExtraCreditNoAging();
 
         // Hold duplicated process queues for each algorithm to use
         PriorityQueue<Process>[] q = new PriorityQueue[ALGORITHM_COUNT + 1];

@@ -1,13 +1,14 @@
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /*******************************************************************
- * Extends Scheduler as a Nonpreemptive highest priority first algorithm
+ * Extends Scheduler as a Nonpreemptive highest priority first algorithm w/o aging
  * which schedules based on priority and uses round robin within priorities
  * Reads a PriorityQueue<Process>, schedules it, and returns a new Queue<Process>
  * @author Michael Riha
@@ -15,7 +16,7 @@ import java.util.logging.Logger;
  * @version FINAL
  * *****************************************************************/
 
-public class NonpreemptiveHighestPriorityFirst extends Scheduler 
+public class NonpreemptiveHighestPriorityFirstNoAging extends Scheduler 
 {    
     @Override
     public Queue<Process> schedule(PriorityQueue<Process> q) 
@@ -29,7 +30,10 @@ public class NonpreemptiveHighestPriorityFirst extends Scheduler
         Queue<Process> scheduledQueue = new LinkedList<>();
         
         // Keep track of start times to get correct turnaround time
-        HashMap<Character, Integer> startTimes = new HashMap<>();
+        Map<Character, Integer> startTimes = new HashMap<>();
+        
+        // Keep track of when processes last ran to calculate waiting time
+        Map<Character, Integer> runTimes = new HashMap<>();
         
         // Queue processes that are ready to run, and order by shortest run time
         // break ties with arrival time so they are readied in the correct order
@@ -114,16 +118,17 @@ public class NonpreemptiveHighestPriorityFirst extends Scheduler
             startTime = Math.max((int) Math.ceil(p.getArrivalTime()), finishTime);
             finishTime = startTime + 1;
             
-            // Record the start time if we haven't seen this process name before
-            // also record the response and wait times
+            // Record some stats if we haven't seen this process before
             if (!startTimes.containsKey(p.getName()))
             {
-                if (startTime > 100) // don't allow a process to begin after time 100
-                    break;           // but do allow processes to finish executing after 100
+                if (startTime > 100)
+                    break;
                 startTimes.put(p.getName(), startTime);
                 stats.addWaitTime(startTime - p.getArrivalTime());
                 stats.addResponseTime(startTime - p.getArrivalTime() + 1);
             }
+            else // add the wait time this process was in waitingQueue
+                stats.addWaitTime(startTime - runTimes.get(p.getName()));
             
             // split p into a second process with n-1 time slices and add to waiting queue
             if (p.getBurstTime() > 1)
@@ -133,10 +138,11 @@ public class NonpreemptiveHighestPriorityFirst extends Scheduler
                     remaining = (Process) p.clone();
                     remaining.setBurstTime(remaining.getBurstTime() - 1);
                     waitingQueue.add(remaining);
+                    runTimes.put(remaining.getName(), finishTime);
                 } 
                 catch (CloneNotSupportedException ex) 
                 {
-                    Logger.getLogger(NonpreemptiveHighestPriorityFirst.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(NonpreemptiveHighestPriorityFirstNoAging.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
             else // this process finished so record turnaround time
