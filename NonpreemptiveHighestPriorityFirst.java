@@ -6,9 +6,17 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/*******************************************************************
+ * Extends Scheduler as a Nonpreemptive highest priority first algorithm
+ * which schedules based on priority and uses round robin within priorities
+ * Reads a PriorityQueue<Process>, schedules it, and returns a new Queue<Process>
+ * @author Michael Riha
+ * @data 06/21/13
+ * @version FINAL
+ * *****************************************************************/
+
 public class NonpreemptiveHighestPriorityFirst extends Scheduler 
-{
-    
+{    
     @Override
     public Queue<Process> schedule(PriorityQueue<Process> q) 
     {
@@ -110,7 +118,8 @@ public class NonpreemptiveHighestPriorityFirst extends Scheduler
             // also record the response and wait times
             if (!startTimes.containsKey(p.getName()))
             {
-                //System.out.println(startTime);
+                if (startTime > 100) // don't allow a process to begin after time 100
+                    break;           // but do allow processes to finish executing after 100
                 startTimes.put(p.getName(), startTime);
                 stats.addWaitTime(startTime - p.getArrivalTime());
                 stats.addResponseTime(startTime - p.getArrivalTime() + 1);
@@ -135,10 +144,6 @@ public class NonpreemptiveHighestPriorityFirst extends Scheduler
                 stats.addTurnaroundTime(finishTime - startTimes.get(p.getName()));
                 stats.addProcess();
             }
-            
-            // Don't start any processes after 100 time slices
-            if (startTime > 100)
-                break;
             
             // Create a new process with the calculated start time and add to a new queue
             scheduled = new Process();

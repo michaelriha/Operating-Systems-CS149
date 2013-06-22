@@ -6,9 +6,17 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/*******************************************************************
+ * Extends Scheduler as a RoundRobin algorithm which distinguishes by priority
+ * and does not use aging
+ * Reads a PriorityQueue<Process>, schedules it, and returns a new Queue<Process>
+ * @author Michael Riha
+ * @data 06/21/13
+ * @version FINAL
+ * *****************************************************************/
+
 public class RoundRobinExtraCreditNoAging extends Scheduler 
-{
-    
+{    
     @Override
     public Queue<Process> schedule(PriorityQueue<Process> q) 
     {
@@ -110,7 +118,8 @@ public class RoundRobinExtraCreditNoAging extends Scheduler
             // also record the response and wait times
             if (!startTimes.containsKey(p.getName()))
             {
-                //System.out.println(startTime);
+                if (startTime > 100)
+                    break;
                 startTimes.put(p.getName(), startTime);
                 stats.addWaitTime(startTime - p.getArrivalTime());
                 stats.addResponseTime(startTime - p.getArrivalTime() + 1);
@@ -136,10 +145,6 @@ public class RoundRobinExtraCreditNoAging extends Scheduler
                 stats.addProcess();
             }
             
-            // Don't start any processes after 100 time slices
-            if (startTime > 100)
-                break;
-            
             // Create a new process with the calculated start time and add to a new queue
             scheduled = new Process();
             scheduled.setBurstTime(1);
@@ -147,6 +152,7 @@ public class RoundRobinExtraCreditNoAging extends Scheduler
             scheduled.setName(p.getName());
             scheduledQueue.add(scheduled);            
         }
+        
         stats.addQuanta(finishTime); // Add the total quanta to finish all jobs
         printTimeChart(scheduledQueue);
         printRoundAvgStats();
