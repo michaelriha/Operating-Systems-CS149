@@ -17,19 +17,20 @@ public class ShortestJobFirst extends Scheduler
         
         // Queue processes that are waiting to run, and order by shortest run time
         PriorityQueue<Process> readyQueue = new PriorityQueue<>(10, 
-            new Comparator() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                Process p1 = (Process) o1;
-                Process p2 = (Process) o2;
-                if (p1.getBurstTime() == p2.getBurstTime())
-                    return p1.getArrivalTime() < p2.getArrivalTime() ? -1 : 1;
-                else
-                    return p1.getBurstTime() < p2.getBurstTime() ? -1 : 1;
-            }            
-        });
+            new Comparator() 
+            {
+                @Override
+                public int compare(Object o1, Object o2) {
+                    Process p1 = (Process) o1;
+                    Process p2 = (Process) o2;
+                    if (p1.getBurstTime() == p2.getBurstTime())
+                        return p1.getArrivalTime() < p2.getArrivalTime() ? -1 : 1;
+                    else
+                        return p1.getBurstTime() < p2.getBurstTime() ? -1 : 1;
+                }            
+            });
         
-        while (!q.isEmpty())
+        while (!q.isEmpty() || !readyQueue.isEmpty())
         {            
             p = readyQueue.isEmpty() ? q.poll() : readyQueue.poll();
                        
@@ -40,7 +41,7 @@ public class ShortestJobFirst extends Scheduler
             if (startTime > 100) 
                 break;
             // add processes that have arrived by now to the ready queue
-            while (q.peek() != null && Math.ceil(q.peek().getArrivalTime()) < finishTime)
+            while (q.peek() != null && q.peek().getArrivalTime() <= finishTime)
                 readyQueue.add(q.poll());
             
             // Record the statistics for this process
@@ -55,24 +56,6 @@ public class ShortestJobFirst extends Scheduler
             scheduled.setStartTime(startTime);
             scheduled.setName(p.getName());
             scheduledQueue.add(scheduled);            
-        }
-        // Get any remaining values out of the ready queue
-        while (!readyQueue.isEmpty())
-        {
-            p = readyQueue.poll();           
-            startTime = Math.max((int) Math.ceil(p.getArrivalTime()), finishTime);      
-            if (startTime > 100) 
-                break;
-            finishTime = startTime + p.getBurstTime();            
-            stats.addWaitTime(startTime - p.getArrivalTime());
-            stats.addTurnaroundTime(startTime - p.getArrivalTime() + p.getBurstTime());
-            stats.addResponseTime(startTime - p.getArrivalTime() + p.getBurstTime());
-            stats.addProcess();      
-            scheduled = new Process();
-            scheduled.setBurstTime(p.getBurstTime());
-            scheduled.setStartTime(startTime);
-            scheduled.setName(p.getName());
-            scheduledQueue.add(scheduled);             
         }
         
         stats.addQuanta(finishTime); // Add the total quanta to finish all jobs
