@@ -14,7 +14,7 @@ import java.util.PriorityQueue;
 public class Main
 {
     private static final int SIMULATION_RUNS = 5;
-    private static final int PROCESSES_PER_RUN = 26;
+    private static final int PROCESSES_PER_RUN = 20;
     private static final int ALGORITHM_COUNT = 6;
     
     public static void main(String[] args) throws CloneNotSupportedException 
@@ -25,9 +25,9 @@ public class Main
         Scheduler nhpf = new NonpreemptiveHighestPriorityFirst();
         Scheduler sjf = new ShortestJobFirst();
         //Scheduler srt = new ShortestRemainingTime();
-        //Scheduler rr = new RoundRobin();
+        Scheduler rrna = new RoundRobinExtraCreditNoAging();
 
-        // Holld duplicated process queues for each algorithm to use
+        // Hold duplicated process queues for each algorithm to use
         PriorityQueue<Process>[] q = new PriorityQueue[ALGORITHM_COUNT + 1];
         q = (PriorityQueue<Process>[]) q;
         
@@ -61,42 +61,42 @@ public class Main
 //            System.out.print("\nSRT:  ");
 //            srt.schedule(q);
 
-//            System.out.print("\nRR:   ");
-//            rr.schedule(q);
+            System.out.print("\nRRNA:   ");
+            rrna.schedule(q[5]);
         }
         
-       // System.out.println("\nAverage Statistics by Scheduling Algorithm:\n");
+        System.out.println("\nAverage Statistics by Scheduling Algorithm:");
 
-        //System.out.println("First Come First Served");
-       // fcfs.printAvgStats();
+        System.out.println("\nFirst Come First Served");
+        fcfs.printAvgStats();
 //
 //        System.out.println("Preemptive Highest Priority First");
 //        printAvgStats(phpf);
 //
-//        System.out.println("Nonpreemptive Highest Priority First");
-//        printAvgStats(nhpf);
-//
-//        System.out.println("Shortest Job First");
-//        printAvgStats(sjf);
-//
+        System.out.println("\nNonpreemptive Highest Priority First");
+        nhpf.printAvgStats();
+
+        System.out.println("\nShortest Job First");
+        sjf.printAvgStats();
+
 //        System.out.println("Shortest Runtime");
 //        printAvgStats(srt);
 //
-//        System.out.println("Round Robin");
-//        printAvgStats(rr);
+        System.out.println("\nRound Robin Extra Credit No Aging (Same as NHPF)");
+        rrna.printAvgStats();
     }
     
     private static PriorityQueue<Process> copyQueue(PriorityQueue<Process> q) throws CloneNotSupportedException
     {        
-            PriorityQueue<Process> qcopy = new PriorityQueue<>();
-            ArrayList<Process> qoriginal = new ArrayList<>();
-            while (!q.isEmpty())
-            {
-                Process p = q.poll();
-                qcopy.add((Process) p.clone());
-                qoriginal.add(p);
-            }
-            q.addAll(qoriginal);
-            return qcopy;
+        PriorityQueue<Process> qcopy = new PriorityQueue<>();
+        ArrayList<Process> qoriginal = new ArrayList<>();
+        while (!q.isEmpty())
+        {
+            Process p = q.poll();
+            qcopy.add((Process) p.clone());
+            qoriginal.add(p);
+        }
+        q.addAll(qoriginal);
+        return qcopy;
     }
 }
