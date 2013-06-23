@@ -111,10 +111,10 @@ public abstract class Scheduler
      */
     public void printAvgStats()
     {
-        System.out.format("\nTurnaround time: %f\n", stats.getAvgTurnaroundTime());
-        System.out.format("Waiting time: %f\n", stats.getAvgWaitingTime());
-        System.out.format("Response time: %f\n", stats.getAvgResponseTime());
-        System.out.format("Throughput per 100 quanta: %f\n", stats.getAvgThroughput());
+        System.out.format("    Turnaround time: %f\n", stats.getAvgTurnaroundTime());
+        System.out.format("    Waiting time: %f\n", stats.getAvgWaitingTime());
+        System.out.format("    Response time: %f\n", stats.getAvgResponseTime());
+        System.out.format("    Throughput per 100 quanta: %f\n", stats.getAvgThroughput());
     }
     
     /**
@@ -122,10 +122,10 @@ public abstract class Scheduler
      */
     public void printRoundAvgStats()
     {
-        System.out.format("\nTurnaround time: %f\n", stats.getRoundAvgTurnaroundTime());
-        System.out.format("Waiting time: %f\n", stats.getRoundAvgWaitingTime());
-        System.out.format("Response time: %f\n", stats.getRoundAvgResponseTime());
-        System.out.format("Throughput per 100 quanta: %f\n", stats.getRoundAvgThroughput());
+        System.out.format("    Turnaround time: %f\n", stats.getRoundAvgTurnaroundTime());
+        System.out.format("    Waiting time: %f\n", stats.getRoundAvgWaitingTime());
+        System.out.format("    Response time: %f\n", stats.getRoundAvgResponseTime());
+        System.out.format("    Throughput per 100 quanta: %f\n", stats.getRoundAvgThroughput());
     }
     
     /**

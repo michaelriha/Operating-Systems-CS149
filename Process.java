@@ -56,7 +56,7 @@ public class Process implements Cloneable, Comparable
     public String toString() 
     {
         return String.format(
-                "Process %c [arrivalTime=%f, expectedRunTime=%d, priority=%d]",
+                "    Process %c [arrivalTime=%f, expectedRunTime=%d, priority=%d]",
                 name, arrivalTime, burstTime, priority);
     }	
 }

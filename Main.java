@@ -25,6 +25,7 @@ public class Main
         Scheduler nhpf = new NonpreemptiveHighestPriorityFirstNoAging();
         Scheduler rrna = new NonpreemptiveHighestPriorityFirstNoAging();
         Scheduler sjf = new ShortestJobFirst();
+        Scheduler rr = new RoundRobin();
         //Scheduler srt = new ShortestRemainingTime();
 
         // Hold duplicated process queues for each algorithm to use
@@ -34,7 +35,9 @@ public class Main
         // Test each scheduling algorithm SIMULATION_RUNS times
         for (int i = 0; i < SIMULATION_RUNS; ++i)
         {
-            System.out.format("\nScheduling Process Queue %d\n\n", i + 1);
+            System.out.println("---------------------------");
+            System.out.format("Scheduling Process Queue %d:\n", i + 1);
+            System.out.println("---------------------------");
             
             //generate a new process queue for this testing round then duplicate it
             q[0] = ProcessFactory.generateProcesses(PROCESSES_PER_RUN);
@@ -55,34 +58,38 @@ public class Main
             System.out.print("\nNHPF: ");
             nhpf.schedule(q[2]);
             
+            System.out.print("\nRR:   ");
+            rr.schedule(q[3]);
+            
 //            System.out.print("\nPHPF: ");
 //            phpf.schedule(q);
 
 //            System.out.print("\nSRT:  ");
 //            srt.schedule(q);
 
-            System.out.print("\nRRNA:   ");
+            System.out.print("\nRRNA: ");
             rrna.schedule(q[5]);
         }
-        
-        System.out.println("\nAverage Statistics by Scheduling Algorithm:");
+        System.out.println("-------------------------------------------");
+        System.out.println("Average Statistics by Scheduling Algorithm:");
+        System.out.println("-------------------------------------------");
 
-        System.out.println("\nFirst Come First Served");
+        System.out.println("  First Come First Served");
         fcfs.printAvgStats();
 //
-//        System.out.println("Preemptive Highest Priority First");
+//        System.out.println("  Preemptive Highest Priority First");
 //        printAvgStats(phpf);
 //
-        System.out.println("\nNonpreemptive Highest Priority First");
+        System.out.println("\n  Nonpreemptive Highest Priority First");
         nhpf.printAvgStats();
 
-        System.out.println("\nShortest Job First");
+        System.out.println("\n  Shortest Job First");
         sjf.printAvgStats();
 
-//        System.out.println("Shortest Runtime");
+//        System.out.println("  Shortest Runtime");
 //        printAvgStats(srt);
 //
-        System.out.println("\nRound Robin Extra Credit No Aging (Same as NHPF)");
+        System.out.println("\n  Round Robin Extra Credit No Aging (Same as NHPF)");
         rrna.printAvgStats();
     }
     
