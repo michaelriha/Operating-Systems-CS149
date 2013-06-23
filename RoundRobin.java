@@ -21,27 +21,16 @@ public class RoundRobin extends Scheduler
     @Override
     public Queue<Process> schedule(PriorityQueue<Process> q) 
     {
-        int finishTime = 0;
-        int startTime;
-        Process p;
-        Process scheduled;
-        Process remaining;
+        int startTime, finishTime = 0;
+        Process p, scheduled, remaining;
         Scheduler.Stats stats = this.getStats();
-        Queue<Process> scheduledQueue = new LinkedList<>();
+           
+        Map<Character, Integer> startTimes = new HashMap<>();        
+        Map<Character, Integer> finishTimes = new HashMap<>();
         
-        // Keep track of start times to get correct turnaround time
-        Map<Character, Integer> startTimes = new HashMap<>();
-        
-        // Keep track of when processes last ran to calculate waiting time
-        Map<Character, Integer> runTimes = new HashMap<>();
-        
-        // Queue processes that are ready to run, and order by shortest run time
-        // break ties with arrival time so they are readied in the correct order
-        Queue<Process> readyQueue = new LinkedList<>();
-        
-        // Queue processes that are waiting to run by priority ONLY so that they
-        // are switched currently in round robin
+        Queue<Process> readyQueue = new LinkedList<>();        
         Queue<Process> waitingQueue = new LinkedList<>();
+        Queue<Process> scheduledQueue = new LinkedList<>();     
         
         while (!q.isEmpty() || !readyQueue.isEmpty() || !waitingQueue.isEmpty())
         {
@@ -71,7 +60,7 @@ public class RoundRobin extends Scheduler
                 stats.addResponseTime(startTime - p.getArrivalTime() + 1);
             }
             else // add the wait time this process was in waitingQueue
-                stats.addWaitTime(startTime - runTimes.get(p.getName()));
+                stats.addWaitTime(startTime - finishTimes.get(p.getName()));
             
             // split p into a second process with n-1 time slices and add to waiting queue
             if (p.getBurstTime() > 1)
@@ -81,7 +70,7 @@ public class RoundRobin extends Scheduler
                     remaining = (Process) p.clone();
                     remaining.setBurstTime(remaining.getBurstTime() - 1);
                     waitingQueue.add(remaining);
-                    runTimes.put(remaining.getName(), finishTime);
+                    finishTimes.put(remaining.getName(), finishTime);
                 } 
                 catch (CloneNotSupportedException ex) 
                 {
@@ -92,16 +81,14 @@ public class RoundRobin extends Scheduler
             {
                 stats.addTurnaroundTime(finishTime - startTimes.get(p.getName()));
                 stats.addProcess();
-            }
-            
+            }            
             // Create a new process with the calculated start time and add to a new queue
             scheduled = new Process();
             scheduled.setBurstTime(1);
             scheduled.setStartTime(startTime);
             scheduled.setName(p.getName());
             scheduledQueue.add(scheduled);            
-        }
-        
+        }        
         stats.addQuanta(finishTime); // Add the total quanta to finish all jobs
         printTimeChart(scheduledQueue);
         printRoundAvgStats();

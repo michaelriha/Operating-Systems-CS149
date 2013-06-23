@@ -26,6 +26,7 @@ public class Main
         Scheduler rrna = new NonpreemptiveHighestPriorityFirstNoAging();
         Scheduler sjf = new ShortestJobFirst();
         Scheduler rr = new RoundRobin();
+        Scheduler srt = new ShortestRemainingTime();
         //Scheduler srt = new ShortestRemainingTime();
 
         // Hold duplicated process queues for each algorithm to use
@@ -61,6 +62,8 @@ public class Main
             System.out.print("\nRR:   ");
             rr.schedule(q[3]);
             
+            System.out.print("\nSRT:  ");
+            srt.schedule(q[4]);
 //            System.out.print("\nPHPF: ");
 //            phpf.schedule(q);
 
@@ -80,7 +83,7 @@ public class Main
 //        System.out.println("  Preemptive Highest Priority First");
 //        printAvgStats(phpf);
 //
-        System.out.println("\n  Nonpreemptive Highest Priority First");
+        System.out.println("\n  Nonpreemptive Highest Priority First / Round Robin Extra Credit (No Aging)");
         nhpf.printAvgStats();
 
         System.out.println("\n  Shortest Job First");

@@ -147,8 +147,8 @@ public abstract class Scheduler
         System.out.println();
     }
     /**
-     * Go through the process queue and create a new process queue using the 
-     * selected scheduling algorithm
+     * Go through the process queue (sorted by arrival time) 
+     * and create a new process queue using the selected scheduling algorithm
      * @return A scheduled process queue
      */
     public abstract Queue<Process> schedule(PriorityQueue<Process> q);

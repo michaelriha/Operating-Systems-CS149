@@ -29,11 +29,9 @@ public class NonpreemptiveHighestPriorityFirstNoAging extends Scheduler
         Scheduler.Stats stats = this.getStats();
         Queue<Process> scheduledQueue = new LinkedList<>();
         
-        // Keep track of start times to get correct turnaround time
+        // Need to keep track of these to calculate turnaround and wait times
         Map<Character, Integer> startTimes = new HashMap<>();
-        
-        // Keep track of when processes last ran to calculate waiting time
-        Map<Character, Integer> runTimes = new HashMap<>();
+        Map<Character, Integer> finishTimes = new HashMap<>();
         
         // Queue processes that are ready to run, and order by shortest run time
         // break ties with arrival time so they are readied in the correct order
@@ -53,7 +51,7 @@ public class NonpreemptiveHighestPriorityFirstNoAging extends Scheduler
             });
         
         // Queue processes that are waiting to run by priority ONLY so that they
-        // are switched currently in round robin
+        // are switched correctly in round robin
         PriorityQueue<Process> waitingQueue = new PriorityQueue<>(10, 
             new Comparator()
             {
@@ -73,46 +71,15 @@ public class NonpreemptiveHighestPriorityFirstNoAging extends Scheduler
                 readyQueue.add(q.poll());
             
             // Get the process with the highest priority that can start now
-            // Order readyQueue > Q > waitingQueue to ensure round robin fairness     
+            // Order readyQueue > waitingQueue > q to ensure round robin fairness     
             if (readyQueue.isEmpty())
-            {
-                if (waitingQueue.isEmpty())
-                    p = q.poll();
-                else if (q.isEmpty())
-                    p = waitingQueue.poll();
-                else
-                    p = (waitingQueue.peek().getPriority() >= q.peek().getPriority()
-                            && q.peek().getArrivalTime() <= finishTime)
-                      ? q.poll()
-                      : waitingQueue.poll();
-            }
-            else if (waitingQueue.isEmpty())
-            {
-                if (q.isEmpty())
-                    p = readyQueue.poll();
-                else
-                    p = (readyQueue.peek().getPriority() > q.peek().getPriority()
-                            && q.peek().getArrivalTime() <= finishTime)
-                      ? q.poll()
-                      : readyQueue.poll();
-            }
+                p = (waitingQueue.isEmpty()) ? q.poll() : waitingQueue.poll();
+            else if (waitingQueue.isEmpty())            
+                p = readyQueue.poll();
             else
-            {
-                if (q.isEmpty())
-                    p = (readyQueue.peek().getPriority() <= waitingQueue.peek().getPriority())
-                      ? readyQueue.poll()
-                      : waitingQueue.poll();
-                else if (readyQueue.peek().getPriority() <= waitingQueue.peek().getPriority())
-                    p = (readyQueue.peek().getPriority() > q.peek().getPriority()
-                            && q.peek().getArrivalTime() <= finishTime)
-                      ? q.poll()
-                      : readyQueue.poll();
-                else 
-                    p = (waitingQueue.peek().getPriority() >= q.peek().getPriority()
-                            && q.peek().getArrivalTime() <= finishTime)
-                      ? q.poll()
-                      : waitingQueue.poll();
-            }
+                p = (readyQueue.peek().getPriority() <= waitingQueue.peek().getPriority())
+                  ? readyQueue.poll()
+                  : waitingQueue.poll();
             
             // Assign p one time slice for now
             startTime = Math.max((int) Math.ceil(p.getArrivalTime()), finishTime);
@@ -128,7 +95,7 @@ public class NonpreemptiveHighestPriorityFirstNoAging extends Scheduler
                 stats.addResponseTime(startTime - p.getArrivalTime() + 1);
             }
             else // add the wait time this process was in waitingQueue
-                stats.addWaitTime(startTime - runTimes.get(p.getName()));
+                stats.addWaitTime(startTime - finishTimes.get(p.getName()));
             
             // split p into a second process with n-1 time slices and add to waiting queue
             if (p.getBurstTime() > 1)
@@ -138,7 +105,7 @@ public class NonpreemptiveHighestPriorityFirstNoAging extends Scheduler
                     remaining = (Process) p.clone();
                     remaining.setBurstTime(remaining.getBurstTime() - 1);
                     waitingQueue.add(remaining);
-                    runTimes.put(remaining.getName(), finishTime);
+                    finishTimes.put(remaining.getName(), finishTime);
                 } 
                 catch (CloneNotSupportedException ex) 
                 {
@@ -149,16 +116,14 @@ public class NonpreemptiveHighestPriorityFirstNoAging extends Scheduler
             {
                 stats.addTurnaroundTime(finishTime - startTimes.get(p.getName()));
                 stats.addProcess();
-            }
-            
+            }            
             // Create a new process with the calculated start time and add to a new queue
             scheduled = new Process();
             scheduled.setBurstTime(1);
             scheduled.setStartTime(startTime);
             scheduled.setName(p.getName());
             scheduledQueue.add(scheduled);            
-        }
-        
+        }        
         stats.addQuanta(finishTime); // Add the total quanta to finish all jobs
         printTimeChart(scheduledQueue);
         printRoundAvgStats();
