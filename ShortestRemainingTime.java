@@ -8,8 +8,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /*******************************************************************
- * Extends Scheduler as a Nonpreemptive highest priority first algorithm w/o aging
- * which schedules based on priority and uses round robin within priorities
+ * Extends Scheduler as a ShortestRemainingTime algorithm w/o aging
+ * which schedules based on shortest remaining and uses FCFS as a tiebreaker
  * Reads a PriorityQueue<Process>, schedules it, and returns a new Queue<Process>
  * @author Michael Riha
  * @data 06/21/13
@@ -77,14 +77,9 @@ public class ShortestRemainingTime extends Scheduler
             else if (waitingQueue.isEmpty())
                 p = readyQueue.poll();
             else
-                if (q.isEmpty())
-                    p = (readyQueue.peek().getBurstTime() < waitingQueue.peek().getBurstTime())
-                      ? readyQueue.poll()
-                      : waitingQueue.poll();
-                else
-                    p = (readyQueue.peek().getBurstTime() < waitingQueue.peek().getBurstTime()) 
-                      ? readyQueue.poll()
-                      : waitingQueue.poll();
+                p = (readyQueue.peek().getBurstTime() < waitingQueue.peek().getBurstTime()) 
+                  ? readyQueue.poll()
+                  : waitingQueue.poll();
             
             // Assign p one time slice for now
             startTime = Math.max((int) Math.ceil(p.getArrivalTime()), finishTime);
