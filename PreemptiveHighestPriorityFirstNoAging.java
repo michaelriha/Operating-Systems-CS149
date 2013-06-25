@@ -8,15 +8,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /*******************************************************************
- * Extends Scheduler as a ShortestRemainingTime algorithm w/o aging
- * which schedules based on shortest remaining and uses FCFS as a tiebreaker
- * Preempts a running process if a shorter job comes in, but allows the current
- * process to finish if they have the same runtime
+ * Extends Scheduler as a Preemptive highest priority first algorithm w/o aging
+ * which schedules based on priority and uses round robin within priority levels
  * Reads a PriorityQueue<Process>, schedules it, and returns a new Queue<Process>
  * @author Michael Riha
  * *****************************************************************/
 
-public class ShortestRemainingTime extends Scheduler 
+public class PreemptiveHighestPriorityFirstNoAging extends Scheduler 
 {    
     @Override
     public Queue<Process> schedule(PriorityQueue<Process> q) 
@@ -43,14 +41,15 @@ public class ShortestRemainingTime extends Scheduler
                 {
                     Process p1 = (Process) o1;
                     Process p2 = (Process) o2;
-                    if (p1.getBurstTime() == p2.getBurstTime())
-                        return p1.getArrivalTime() <= p2.getArrivalTime() ? -1 : 1;
+                    if (p1.getPriority() == p2.getPriority())
+                        return p1.getArrivalTime() < p2.getArrivalTime() ? -1 : 1;
                     else
-                        return p1.getBurstTime() < p2.getBurstTime() ? -1 : 1;
+                        return p1.getPriority() < p2.getPriority() ? -1 : 1;
                 }            
             });
         
-        // Queue processes that are waiting to run by priority and remaining time
+        // Queue processes that are waiting to run by priority ONLY so that they
+        // are switched correctly in round robin
         PriorityQueue<Process> waitingQueue = new PriorityQueue<>(10, 
             new Comparator()
             {
@@ -59,10 +58,7 @@ public class ShortestRemainingTime extends Scheduler
                 {
                     Process p1 = (Process) o1;
                     Process p2 = (Process) o2;
-                    if (p1.getBurstTime() == p2.getBurstTime())
-                        return p1.getArrivalTime() <= p2.getArrivalTime() ? -1 : 1;
-                    else
-                        return p1.getBurstTime() < p2.getBurstTime() ? -1 : 1;
+                    return p1.getPriority() < p2.getPriority() ? -1 : 1;
                 }            
             });
         
@@ -72,14 +68,14 @@ public class ShortestRemainingTime extends Scheduler
             while (!q.isEmpty() && q.peek().getArrivalTime() <= finishTime)
                 readyQueue.add(q.poll());
             
-            // Get the process with the shortest remaining time that can start now
-            // Break ties Waiting > Ready > Q to prioritize already running process 
+            // Get the process with the highest priority that can start now
+            // Order readyQueue > waitingQueue > q to ensure round robin fairness     
             if (readyQueue.isEmpty())
                 p = (waitingQueue.isEmpty()) ? q.poll() : waitingQueue.poll();
-            else if (waitingQueue.isEmpty())
+            else if (waitingQueue.isEmpty())            
                 p = readyQueue.poll();
             else
-                p = (readyQueue.peek().getBurstTime() < waitingQueue.peek().getBurstTime()) 
+                p = (readyQueue.peek().getPriority() <= waitingQueue.peek().getPriority())
                   ? readyQueue.poll()
                   : waitingQueue.poll();
             
@@ -111,7 +107,7 @@ public class ShortestRemainingTime extends Scheduler
                 } 
                 catch (CloneNotSupportedException ex) 
                 {
-                    Logger.getLogger(NonpreemptiveHighestPriorityFirstNoAging.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(PreemptiveHighestPriorityFirstNoAging.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
             else // this process finished so record turnaround time

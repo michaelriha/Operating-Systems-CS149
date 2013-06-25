@@ -37,9 +37,9 @@ public class FirstComeFirstServed extends Scheduler
             
             // Record the statistics for this process
             stats.addWaitTime(startTime - p.getArrivalTime());
-            stats.addTurnaroundTime(startTime - p.getArrivalTime() + p.getBurstTime());
-            stats.addResponseTime(startTime - p.getArrivalTime() + p.getBurstTime());
-            stats.addProcess();            
+            stats.addTurnaroundTime(finishTime - p.getArrivalTime());
+            stats.addResponseTime(finishTime - startTime);
+            stats.addProcess();                      
 
             // Create a new process with the calculated start time and add to a new queue
             scheduled = new Process();

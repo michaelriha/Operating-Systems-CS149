@@ -3,8 +3,8 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-public class ShortestJobFirst extends Scheduler 
-{
+public class ShortestJobFirstNoAging extends Scheduler 
+{    
     @Override
     public Queue<Process> schedule(PriorityQueue<Process> q) 
     {
@@ -12,37 +12,40 @@ public class ShortestJobFirst extends Scheduler
         int startTime;
         Process p;
         Process scheduled;
-        Stats stats = this.getStats();
+        Scheduler.Stats stats = this.getStats();
         Queue<Process> scheduledQueue = new LinkedList<>();
         
-        // Queue processes that are waiting to run, and order by shortest run time
+        // Queue processes that are ready to run, and order by shortest run time
+        // break ties with arrival time so they are readied in the correct order
         PriorityQueue<Process> readyQueue = new PriorityQueue<>(10, 
-            new Comparator() 
+            new Comparator()
             {
                 @Override
-                public int compare(Object o1, Object o2) {
+                public int compare(Object o1, Object o2) 
+                {
                     Process p1 = (Process) o1;
                     Process p2 = (Process) o2;
-                    if (p1.getBurstTime() == p2.getBurstTime())
-                        return p1.getArrivalTime() < p2.getArrivalTime() ? -1 : 1;
-                    else
+                    if (p1.getPriority() == p2.getPriority())
                         return p1.getBurstTime() < p2.getBurstTime() ? -1 : 1;
+                    else
+                        return p1.getPriority() < p2.getPriority() ? -1 : 1;
                 }            
             });
         
         while (!q.isEmpty() || !readyQueue.isEmpty())
-        {            
+        {
+            // add processes that have arrived by now to the ready queue
+            while (!q.isEmpty() && q.peek().getArrivalTime() <= finishTime)
+                readyQueue.add(q.poll());
+            
             p = readyQueue.isEmpty() ? q.poll() : readyQueue.poll();
-                       
-            startTime = Math.max((int) Math.ceil(p.getArrivalTime()), finishTime);
+            
+            startTime = Math.max((int) Math.ceil(p.getArrivalTime()), finishTime);            
             finishTime = startTime + p.getBurstTime();
             
             // Don't start any processes after 100 time slices
             if (startTime > 100) 
                 break;
-            // add processes that have arrived by now to the ready queue
-            while (q.peek() != null && q.peek().getArrivalTime() <= finishTime)
-                readyQueue.add(q.poll());
             
             // Record the statistics for this process
             stats.addWaitTime(startTime - p.getArrivalTime());
@@ -55,9 +58,8 @@ public class ShortestJobFirst extends Scheduler
             scheduled.setBurstTime(p.getBurstTime());
             scheduled.setStartTime(startTime);
             scheduled.setName(p.getName());
-            scheduledQueue.add(scheduled);            
-        }
-        
+            scheduledQueue.add(scheduled);              
+        }        
         stats.addQuanta(finishTime); // Add the total quanta to finish all jobs
         printTimeChart(scheduledQueue);
         printRoundAvgStats();

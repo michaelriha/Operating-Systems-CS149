@@ -32,16 +32,20 @@ public class ProcessFactory
         Random randomArrival = new Random();
         Random randomPriority = new Random();        
         Random randomExpectedTime = new Random();
+        
+        double nextArrival = 0.0;
 
         // Generate new processes and add to the process queue 
-        for(int i = 0; i != processCount; ++i)
+        for(int i = 0; i != processCount && nextArrival < 95; ++i)
         {		
             Process p = new Process();
-            p.setArrivalTime(randomArrival.nextFloat() * 100); 
+            p.setArrivalTime(nextArrival); 
             p.setBurstTime(randomExpectedTime.nextInt(10) + 1);
             p.setPriority(randomPriority.nextInt(4) + 1);
             p.setName(names.charAt(i));
             q.add(p);
+            
+            nextArrival += randomArrival.nextFloat() * 10;
         }
         return q;
     }

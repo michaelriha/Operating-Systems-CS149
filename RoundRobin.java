@@ -41,10 +41,10 @@ public class RoundRobin extends Scheduler
             // choose which process to schedule next - Ready > Q > Waiting
             if (!readyQueue.isEmpty())
                 p = readyQueue.poll();
-            else if (!q.isEmpty() && (waitingQueue.isEmpty() || q.peek().getArrivalTime() < finishTime))
+            else if (!q.isEmpty() && waitingQueue.isEmpty())
                 p = q.poll();
             else
-                p = waitingQueue.poll();
+                p = waitingQueue.poll(); 
             
             // Assign p one time slice for now
             startTime = Math.max((int) Math.ceil(p.getArrivalTime()), finishTime);

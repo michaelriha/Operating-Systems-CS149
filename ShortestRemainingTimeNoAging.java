@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  * @author Michael Riha
  * *****************************************************************/
 
-public class ShortestRemainingTime extends Scheduler 
+public class ShortestRemainingTimeNoAging extends Scheduler 
 {    
     @Override
     public Queue<Process> schedule(PriorityQueue<Process> q) 
@@ -33,8 +33,7 @@ public class ShortestRemainingTime extends Scheduler
         Map<Character, Integer> startTimes = new HashMap<>();
         Map<Character, Integer> finishTimes = new HashMap<>();
         
-        // Queue processes that are ready to run, and order by shortest run time
-        // break ties with arrival time so they are readied in the correct order
+        // Queue processes that are ready to run, and order by priority and shortest run time
         PriorityQueue<Process> readyQueue = new PriorityQueue<>(10, 
             new Comparator()
             {
@@ -43,10 +42,10 @@ public class ShortestRemainingTime extends Scheduler
                 {
                     Process p1 = (Process) o1;
                     Process p2 = (Process) o2;
-                    if (p1.getBurstTime() == p2.getBurstTime())
-                        return p1.getArrivalTime() <= p2.getArrivalTime() ? -1 : 1;
-                    else
+                    if (p1.getPriority() == p2.getPriority())
                         return p1.getBurstTime() < p2.getBurstTime() ? -1 : 1;
+                    else
+                        return p1.getPriority() < p2.getPriority() ? -1 : 1;
                 }            
             });
         
@@ -59,10 +58,10 @@ public class ShortestRemainingTime extends Scheduler
                 {
                     Process p1 = (Process) o1;
                     Process p2 = (Process) o2;
-                    if (p1.getBurstTime() == p2.getBurstTime())
-                        return p1.getArrivalTime() <= p2.getArrivalTime() ? -1 : 1;
-                    else
+                    if (p1.getPriority() == p2.getPriority())
                         return p1.getBurstTime() < p2.getBurstTime() ? -1 : 1;
+                    else
+                        return p1.getPriority() < p2.getPriority() ? -1 : 1;
                 }            
             });
         
@@ -79,7 +78,8 @@ public class ShortestRemainingTime extends Scheduler
             else if (waitingQueue.isEmpty())
                 p = readyQueue.poll();
             else
-                p = (readyQueue.peek().getBurstTime() < waitingQueue.peek().getBurstTime()) 
+                p = (readyQueue.peek().getPriority() < waitingQueue.peek().getPriority()
+                     && readyQueue.peek().getBurstTime() < waitingQueue.peek().getBurstTime()) 
                   ? readyQueue.poll()
                   : waitingQueue.poll();
             

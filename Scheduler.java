@@ -122,10 +122,9 @@ public abstract class Scheduler
      */
     public void printRoundAvgStats()
     {
-        System.out.format("    Turnaround time: %f\n", stats.getRoundAvgTurnaroundTime());
-        System.out.format("    Waiting time: %f\n", stats.getRoundAvgWaitingTime());
-        System.out.format("    Response time: %f\n", stats.getRoundAvgResponseTime());
-        System.out.format("    Throughput per 100 quanta: %f\n", stats.getRoundAvgThroughput());
+        System.out.format("    Turnaround: %-2.3f Waiting: %-2.3f Response: %-2.3f Throughput: %-2.3f\n", 
+                stats.getRoundAvgTurnaroundTime(), stats.getRoundAvgWaitingTime(), 
+                stats.getRoundAvgResponseTime(),  stats.getRoundAvgThroughput());
     }
     
     /**
@@ -135,6 +134,7 @@ public abstract class Scheduler
     public static void printTimeChart(Queue<Process> q)
     {
         int quanta = 0;
+        System.out.print("    ");
         for (Process p : q)
         {
             while (quanta++ < p.getStartTime()) // show idle time
