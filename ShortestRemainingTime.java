@@ -7,15 +7,14 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/*******************************************************************
- * Extends Scheduler as a ShortestRemainingTime algorithm w/o aging
+/**
+ * Extends Scheduler as a ShortestRemainingTime algorithm
  * which schedules based on shortest remaining and uses FCFS as a tiebreaker
  * Preempts a running process if a shorter job comes in, but allows the current
  * process to finish if they have the same runtime
  * Reads a PriorityQueue<Process>, schedules it, and returns a new Queue<Process>
  * @author Michael Riha
- * *****************************************************************/
-
+ */
 public class ShortestRemainingTime extends Scheduler 
 {    
     @Override

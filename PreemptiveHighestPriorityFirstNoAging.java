@@ -7,12 +7,12 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/*******************************************************************
+/**
  * Extends Scheduler as a Preemptive highest priority first algorithm w/o aging
  * which schedules based on priority and uses round robin within priority levels
  * Reads a PriorityQueue<Process>, schedules it, and returns a new Queue<Process>
  * @author Michael Riha
- * *****************************************************************/
+ */
 
 public class PreemptiveHighestPriorityFirstNoAging extends Scheduler 
 {    

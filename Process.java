@@ -1,17 +1,8 @@
-
-/*************************************************************************
- * 
- * Process contains process information such as process arrival time
+/**
+ * A process containing information such as process arrival time
  * expected run time, burst time and priority. 
- * 
- * @author Manzoor Ahmed
- * @author Igor Sorokin
  * @author Michael Riha
- * 
- * @version 1.0
- * @data 06/17/2013
- ************************************************************************/
-
+ */
 public class Process implements Cloneable, Comparable
 {   
     @Override

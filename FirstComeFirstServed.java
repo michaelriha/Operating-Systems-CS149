@@ -2,14 +2,11 @@ import java.util.Queue;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
-/*******************************************************************
+/**
  * Extends Scheduler as a First Come First Served algorithm
  * Reads a PriorityQueue<Process>, schedules it, and returns a new Queue<Process>
  * @author Michael Riha
- * @data 06/19/13
- * @version FINAL
- * *****************************************************************/
-
+ */
 public class FirstComeFirstServed extends Scheduler
 {
     @Override

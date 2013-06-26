@@ -1,4 +1,3 @@
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -8,8 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /*******************************************************************
- * Extends Scheduler as a Nonpreemptive highest priority first algorithm w/o aging
- * which schedules based on priority and uses round robin within priorities
+ * Extends Scheduler as a basic Round Robin algorithm ordered by arrival time
  * Reads a PriorityQueue<Process>, schedules it, and returns a new Queue<Process>
  * @author Michael Riha
  * @data 06/21/13

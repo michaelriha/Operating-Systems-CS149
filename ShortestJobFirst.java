@@ -3,6 +3,9 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+/** Extends Scheduler as a Shortest Job First algorithm where processes 
+ * are scheduled by run time then arrival time if they have the same runtime
+ */
 public class ShortestJobFirst extends Scheduler 
 {
     @Override

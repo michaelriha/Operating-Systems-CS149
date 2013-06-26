@@ -3,6 +3,9 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+/** Extends Scheduler as a Shortest Job First algorithm w/o aging where processes 
+ * are scheduled by priority then run time if they have the same priority
+ */
 public class ShortestJobFirstNoAging extends Scheduler 
 {    
     @Override

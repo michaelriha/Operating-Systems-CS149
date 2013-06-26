@@ -1,19 +1,10 @@
 import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.Random;
 
-/********************************************************************************
- *
+/**
  * ProcessFactory generates processes and puts them in a queue
- * 
- * @author Manzoor Ahmed
- * @author Igor Sorokin
- * @author Michael Riha
- * 
- * @date 06/18/13
- * @version 1.0.0
- *  
- * ******************************************************************************/
+ * @author Michael Riha  
+ */
 
 public class ProcessFactory
 {
