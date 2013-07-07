@@ -26,8 +26,8 @@
 
 char visit_office(int i, int tnum);
 void* visitor(void* param);
-void add_thread_id(int i);
-void remove_thread_id();
+void queue_add(int i);
+void queue_poll();
 
 typedef struct _student student;
 struct _student
@@ -52,7 +52,7 @@ int minutes = 1;             // how many minutes into the office hour
 int threads_running = 0;     
 int last_thread_closed = 0;  // used to assign new thread to the correct spot in output
 int minutes_past_closing = 0; // how long since office closed - used for output
-int thread_ids[max_threads]; // thread ids (student #) that are running
+int queue[max_threads];      // thread ids (student #) that are running
 
 char office_available = 1;   // if the office can be enterred by a st udent
 char office_closed = 0;      // if the office is closed for good
@@ -73,7 +73,7 @@ int main(int argc, char** argv)
     threads = calloc(num_students, sizeof(thread));
     
     for (int i = 0; i < max_threads; ++i)
-        thread_ids[i] = -1;
+        queue[i] = -1;
     for (int i = 0; i < max_time+10; ++i)
         main_output[i] = malloc(line_len);
 
@@ -98,13 +98,13 @@ int main(int argc, char** argv)
     int next = 0;    // next student in line
     while (!office_closed)
     {
-        // generate threads for students that have arrived
+        // run threads for students that have arrived
         while (next < num_students && students[next].arrival_time <= minutes)
         {
             if (threads_running < max_threads)
             {
                 pthread_create(&threads[next].tid, &threads[next].tattr, visitor, &threads[next].param);
-                add_thread_id(next);
+                queue_add(next);
             }
             else
             {
@@ -115,6 +115,8 @@ int main(int argc, char** argv)
         int m = minutes++;
         
         // allow strings to buffer some before printing
+        // I would have put this in a print(int m) method but it was causing issues
+        // and this already works
         if (m >= buf_len)
         {
             if (main_output[m - buf_len][0] != '\0')
@@ -131,7 +133,7 @@ int main(int argc, char** argv)
                     sprintf(part, "     %-15s\0", output[m - buf_len][i]);
                 }
                 else
-                    sprintf(part, "     %-15s\0", "   ?");                
+                    sprintf(part, "     %-15s\0", "   N/A");                
                 strcat(out, part);
                 free(part);
             }
@@ -145,7 +147,8 @@ int main(int argc, char** argv)
             free(out);
             printf("\n");
         }
-        usleep(10000);
+        //usleep(10000)
+        sleep(1);
     } 
     
     // print remaining text out
@@ -166,7 +169,7 @@ int main(int argc, char** argv)
                 sprintf(part, "     %-15s\0", output[m][i]);
             }
             else
-                sprintf(part, "     %-15s\0", "   ?");                
+                sprintf(part, "     %-15s\0", "   N/A");                
             strcat(out, part);
             free(part);
         }
@@ -196,7 +199,7 @@ void* visitor(void* param)
     {
         if (visit_office(i, tnum) == 0)
             break;
-        usleep(10000);
+        usleep(950000); // sleep JUST less than 1s so threads don't "disappear"
     }
     
     // Add a close thread message to any existing Main: message
@@ -217,7 +220,7 @@ void* visitor(void* param)
     }
     // Close the thread
     last_thread_closed = tnum;
-    remove_thread_id();
+    queue_poll();
     pthread_join(threads[i].tid, NULL);
 }
 
@@ -241,9 +244,10 @@ char visit_office(int i, int tnum)
         }
         else // visit is over
         {            
-            pthread_mutex_lock(&mutex);
             students[i].is_visiting = 0;
             output[m][tnum] = "Ending visit\0";
+            
+            pthread_mutex_lock(&mutex);
             office_available = 1;
             pthread_mutex_unlock(&mutex);
             return 0; 
@@ -251,61 +255,61 @@ char visit_office(int i, int tnum)
     }
     else
     {   
-        pthread_mutex_lock(&mutex2);
-        if(i == thread_ids[0] && office_available)
-        {
-            pthread_mutex_lock(&mutex);
+        pthread_mutex_lock(&mutex2); // lock queue
+        if(i == queue[0] && office_available)
+        {            
+            pthread_mutex_unlock(&mutex2);
             output[m][tnum] = "Starting visit\0";
-            if (m >= max_time)
-                minutes_past_closing++;
             students[i].is_visiting = 1;
             students[i].duration--;
+            
+            pthread_mutex_lock(&mutex);
+            if (m >= max_time)
+                minutes_past_closing++;
             office_available = 0;
             pthread_mutex_unlock(&mutex);
         }
         else
         {
+            pthread_mutex_unlock(&mutex2);
             if (m >= max_time - 1)
             {
-                output[m][tnum] = "Left:OfficeClosed\0";
-                pthread_mutex_unlock(&mutex2);
+                output[m][tnum] = "Left:OffClosed\0";
                 return 0;
             }
             else if (m - students[i].arrival_time >= leave_time)
             {
-                output[m][tnum] = "Left:WaitTooLong\0";
-                pthread_mutex_unlock(&mutex2);
+                output[m][tnum] = "Left:Waited10s\0";
                 return 0;
             }
             else
                 output[m][tnum] = "Waiting\0";
         }    
     }
-    pthread_mutex_unlock(&mutex2);
     return 1;
 }
 
-/** Add a thread/student to thread_ids
- * int student : the student to add to thread_ids
+/** Add a thread/student to queue queue
+ * int student : the student to add to queue
  */
-void add_thread_id(int student)
+void queue_add(int student)
 {
     pthread_mutex_lock(&mutex2);
     int j;
-    for (j = 0; j < max_threads-1 && thread_ids[j] != -1; ++j);    
+    for (j = 0; j < max_threads-1 && queue[j] != -1; ++j);    
     threads_running++;
-    thread_ids[j] = student;
+    queue[j] = student;
     pthread_mutex_unlock(&mutex2);
 }
 
-// Remove the oldest thread from thread_ids and shift values to the left
-void remove_thread_id()
+// Remove the oldest thread from queue queue and shift values to the left
+void queue_poll()
 {
     pthread_mutex_lock(&mutex2);
     threads_running--;
     int i;
-    for (i = 0; i < max_threads - 1 && thread_ids[i+1] != -1; ++i)
-        thread_ids[i] = thread_ids[i+1];
-    thread_ids[i] = -1;
+    for (i = 0; i < max_threads - 1 && queue[i+1] != -1; ++i)
+        queue[i] = queue[i+1];
+    queue[i] = -1;
     pthread_mutex_unlock(&mutex2);
 }
