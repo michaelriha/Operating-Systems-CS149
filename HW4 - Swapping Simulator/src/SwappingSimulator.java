@@ -23,46 +23,59 @@ public class SwappingSimulator
 {
     public static final int SIM_RUNS = 5;
     public static final int SIM_TIME_MAX = 60; 
-    public static final int PROCESS_COUNT_MAX = 150;
+    public static final int PROCESS_COUNT_MAX = 100;
     
+    /** A simulator corresponding to a single swapping algorithm that tracks 
+     how many processes have been swapped in */
+    private static class Simulator 
+    {
+        private Swapper swap;
+        private String swapStr;
+        private int swappedCount;
+        
+        public Simulator(Swapper swap, String swapStr)
+        {
+            this.swap = swap;
+            this.swapStr = swapStr;
+            this.swappedCount = 0;
+        }
+    }    
+    /** Simulate each algorithm SIM_RUNS times. Print out memory maps 
+     * each time memory is changed, and also print overall statistics 
+     */
     public static void main(String[] args) throws CloneNotSupportedException
     {
-        Swapper bestFit = new BestFitSwapper();
-        Swapper nextFit = new NextFitSwapper();
-        Swapper firstFit = new FirstFitSwapper();        
-        int ffSwappedCount = 0;
-        int nfSwappedCount = 0;
-        int bfSwappedCount = 0;
+        Simulator[] sims = new Simulator[] 
+            {
+                new Simulator(new FirstFitSwapper(), "First Fit"),
+                new Simulator(new NextFitSwapper(), "Next Fit"),
+                new Simulator(new BestFitSwapper(), "Best Fit")        
+            };
         int swapped;
-        
-        for (int i = 0; i < SIM_RUNS; ++i)
+        int runs;
+        System.out.format("Beginning simulation of %d algorithms for  %d runs each\n", sims.length, SIM_RUNS);
+        System.out.println("------------------------------------------------");
+        for (runs = 0; runs < SIM_RUNS; ++runs)
         {
             LinkedList<Process> q = ProcessFactory.generateProcesses(PROCESS_COUNT_MAX);
 
+            System.out.format("Starting Run %d\n", runs);
             System.out.println("Name    Arrival    Duration    Size");
             for (Process p : q)
-            {
                 System.out.format("  %-8c %-10d %-8d %-8d\n", p.name, p.arrival, p.time, p.size);
-            }
-            System.out.println("\nFirst Fit:\nTime: Memory Map");
-            swapped = firstFit.simulate(q);
-            ffSwappedCount += swapped;
-            System.out.format("Swapped in a total of %d processes.\n", swapped);
             
-            System.out.println("\nNext Fit:");
-            swapped = nextFit.simulate(q);
-            nfSwappedCount += swapped;
-            System.out.format("Swapped in a total of %d processes.\n", swapped);
-            
-            System.out.println("\nBest Fit:");
-            swapped = bestFit.simulate(q);
-            bfSwappedCount += swapped;
-            System.out.format("Swapped in a total of %d processes.\n", swapped);
-            
-            System.out.println("-----------------------------------------------");
-            System.out.format("First Fit average processes swapped in: %d\n", ffSwappedCount);
-            System.out.format("Next Fit average processes swapped in: %d\n", nfSwappedCount);
-            System.out.format("Best Fit average processes swapped in: %d\n", bfSwappedCount);            
-        }
+            System.out.println("------------------------------------------------");
+            for (Simulator sim : sims)
+            {
+                System.out.format("\n%s:\nTime: Memory Map\n", sim.swapStr);
+                swapped = sim.swap.simulate(q);
+                sim.swappedCount += swapped;
+                System.out.format("\nSwapped in a total of %d processes.\n", swapped);
+                System.out.println("------------------------------------------------");
+            }         
+        }    
+        System.out.println();
+        for (Simulator sim : sims)
+            System.out.format("Average processes swapped in by %s algorithm: %f\n", sim.swapStr, sim.swappedCount / (double) runs);
     }
 }

@@ -12,14 +12,14 @@ public class BestFitSwapper extends Swapper
     public int getIndex(LinkedList<Process> memory, int size, int start)
     {
         int smallest = -1;
-        int iBest = 0;
+        int iBest = -1;
         int i = 0;
-        for (Process p : memory)
+        for (Process avl : memory)
         {
-            if (p.name == '.' && p.size >= size && (smallest == -1 || p.size < smallest))
+            if (avl.name == '.' && avl.size >= size && (smallest == -1 || avl.size < smallest))
             {
                 iBest = i;
-                smallest = p.size;
+                smallest = avl.size;
             }
             ++i;
         }

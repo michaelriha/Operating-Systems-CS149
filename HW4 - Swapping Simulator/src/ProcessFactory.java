@@ -18,9 +18,9 @@ public class ProcessFactory
     
     
     /** Generate processes randomly until the total task duration is greater
-     * than SIM_TIME_MAX plus PROCESS_TIME_MAX so that we have one or more processes
-     * that cannot finish execution.
-     * @param n int : number of processes to generate
+     * than SIM_TIME_MAX by a bit so that there is at least one process that 
+     * doesn't finish executing
+     * @param n int : maximum number of processes to generate
      */
     public static LinkedList<Process> generateProcesses(int n)
     {
@@ -31,10 +31,10 @@ public class ProcessFactory
         int sizes_used = 0;
         
         Random r = new Random();
-        int arrival = 0;        
-        
+        int arrival = 0;
+        int runtime = 0;
         int processNumber = 0;
-        while (processNumber < n && arrival <= SwappingSimulator.SIM_TIME_MAX)
+        while (processNumber < n && runtime < SwappingSimulator.SIM_TIME_MAX * 2)
         {
             // make the sizes "evenly distributed" by picking one of each
             // size before picking a second one, etc.
@@ -51,14 +51,14 @@ public class ProcessFactory
                 sizes_used = 0;
                 for (int i = 0; i < process_size_used.length; ++i) 
                     process_size_used[i] = false;
-            }
-            
+            }            
             int time = r.nextInt(PROCESS_TIME_MAX) + 1;
+            runtime += time;
             
             processQueue.addLast(new Process(time, size, 
                     NAMES.charAt(processNumber % NAMES.length()), arrival, arrival));
             ++processNumber;
-            arrival += (r.nextInt(PROCESS_TIME_MAX)) / 3;
+            arrival += (r.nextInt(PROCESS_TIME_MAX) + 1) / 2;
         }
         return processQueue;
     }

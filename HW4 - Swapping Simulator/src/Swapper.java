@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -7,11 +6,13 @@ import java.util.Queue;
  * 
  * Class representing a Memory Swapping Algorithm. Extended by 
  * BestFit, NextFit, and FirstFit
+ * 
+ * Simulates the algorithm and prints a memory map every time memory is 
+ * allocated or deallocated.
  */
 public abstract class Swapper 
 {
-    public static final int MEMORY_SIZE_MB = 100;
-    
+    public static final int MEMORY_SIZE_MB = 100;        
     /**
      * Use a particular swapping algorithm to get the index of the next allocation
      * @param memory LinkedList<Process> representing the memory space
@@ -23,101 +24,100 @@ public abstract class Swapper
     
     /**
      * Simulate swapping using the given Swapping Algorithm and collect statistics
-     * @param q Process queue in FCFS order 
+     * @param processQueue Queue<Process> in FCFS order 
      * @return int : number of processes that were successfully swapped in 
      */
-    public int simulate(Queue<Process> q) throws CloneNotSupportedException
+    public int simulate(Queue<Process> processQueue) throws CloneNotSupportedException
     {
         // Create memory with an unallocated block covering the whole space
+        Queue<Process> q = copyQueue(processQueue);
+        Queue<Process>  waitingQueue = new LinkedList<>();
         LinkedList<Process> memory = new LinkedList<>();
-        memory.add(new Process(0, MEMORY_SIZE_MB, '.', 0));
+        memory.add(new Process(0, MEMORY_SIZE_MB, '.', 0, 0));
+        
         int memIndex = -1;
         int swapped = 0;
         int time = 0;
-        Process p = null;
         
-        while (!q.isEmpty())
-        {
-            if ((q.peek().arrival >= time || p == null) && getIndex(memory, q.peek().size, memIndex) != -1)
+        Process p = null;
+        Process running = null;
+        
+        while (!q.isEmpty() || !waitingQueue.isEmpty())
+        {            
+            // Allow the running process to execute for 1 second
+            if (running != null && --running.time == 0)
+            {
+                deallocateProcess(memory, time);
+                memory = mergeAdjacentFragmentedMemory(memory);
+                running = null;
+            }
+            
+            if (running == null && waitingQueue.peek() != null)
+            {
+                running = waitingQueue.poll();
+                //--running.time;
+            }
+            
+            // Allocate processes that have arrived and have memory available for them
+            while (q.peek() != null && q.peek().arrival <= time && getIndex(memory, q.peek().size, memIndex) != -1)
             {
                 p = q.poll();
                 p.start = time;
-            }
-            
-//            // Sleep for 100ms  (10x speedup over realtime)
-//            try {
-//                Thread.sleep(100);
-//            } catch(InterruptedException ex) {
-//                Thread.currentThread().interrupt();
-//            }
-//            
-            // Advance the time to this process's arrival time
-            time = Math.max(time, p.arrival);            
-            if (time > SwappingSimulator.SIM_TIME_MAX)
-                return swapped;
-            
-            // Deallocate processes that finished and then merge any freed memory
-            deallocateMemory(memory, time);
-            memory = mergeAdjacentFragmentedMemory(memory);
-            
-            // Get next memory index. Wait for memory if there is none available
-            memIndex = getIndex(memory, p.size, memIndex);
-            while (memIndex == -1)
-            {
-                if (++time > SwappingSimulator.SIM_TIME_MAX)
-                    return swapped;
-                deallocateMemory(memory, time);
-                memory = mergeAdjacentFragmentedMemory(memory);
+                
+                if (running == null)
+                    running = p;
+                else
+                    waitingQueue.add(p);
+                
+                // Replace the available memory with p and a proportionally smaller available block
                 memIndex = getIndex(memory, p.size, memIndex);
+                Process available = memory.remove(memIndex);
+                available.size -= p.size;
+                memory.add(memIndex, p);
+                if (available.size > 0)
+                    memory.add(memIndex + 1, available);
+                ++swapped;
+            
+                // Print the memory map every time we swap memory
+                printMemoryMap(memory, time);
             }
             
-            // Replace the available memory with p and a proportionally smaller available block
-            Process available = memory.remove(memIndex);
-            available.size -= p.size;
-            memory.add(memIndex, p);
-            memory.add(memIndex + 1, available);
-            ++swapped;
+            if(++time > SwappingSimulator.SIM_TIME_MAX)
+                break;
             
-            // Print the memory map every time we swap memory
-            printMemoryMap(memory, time);
+            // Sleep for 100ms  (10x speedup over realtime)
+            try {
+                Thread.sleep(100);
+            } catch(InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
         }
         return swapped;
-    }
-    
+    }    
     /**
-     * Deallocate memory for processes that finished before or at 'time' seconds
+     * Find the memory for the process that finished and deallocate it
      * @param memory LinkedList<Process> : the memory to search for deallocation
-     * @param time int : deallocate memory that finished before this many seconds
+     * @param time int : the current time for use in printing the memory map
      */
-    public static void deallocateMemory(LinkedList<Process> memory, int time) throws CloneNotSupportedException
+    public static void deallocateProcess(LinkedList<Process> memory, int time) throws CloneNotSupportedException
     {
-        ArrayList<Integer> deallocateQueue = new ArrayList<>();
-        
-        // Find processes that have finished and add to a queue
         int i = 0;
         for (Process p : memory)
-        {
-            if (p.name != '.' && p.arrival + p.time < time)
-                deallocateQueue.add(i);
+        {   /* Remove the finished process and replace with available space ('.' process)
+               NOTE: I could not make the LinkedList access efficient due to 
+               ConcurrentModificationExceptions while using iterator to modify, and 
+               Java does not give direct access to the list pointers for manual traversal
+             */
+            if (p.name != '.' && p.time == 0)
+            {
+                memory.remove(i);
+                memory.add(i, new Process(0, p.size, '.', 0, 0));
+                printMemoryMap(memory, Math.max(p.arrival + p.time, time));
+                break;
+            }
             ++i;
         }
-        
-        /* For each process that finished, remove it and add a free '.' memory block
-           then print the new memory map.
-           NOTE: I could not make the LinkedList access efficient due to 
-           ConcurrentModificationExceptions while using iterator to modify, and 
-           Java does not give direct access to the list pointers for manual traversal
-         */
-        i = 0;
-        for (Integer d : deallocateQueue)
-        {
-            Process p = memory.remove((int) d);
-            memory.add(d, new Process(0, p.size, '.', 0));
-            printMemoryMap(memory, Math.max(p.arrival + p.time, time));
-            ++i;
-        }
-    }
-    
+    }    
     /**
      * Merge adjacent fragmented free memory (processes named '.') into contiguous blocks
      * @param memory Queue / LinkedList<Process> representing the memory space
@@ -134,17 +134,16 @@ public abstract class Swapper
             merged.add(p);
         }
         return merged;
-    }
-    
+    }    
     /**
      * Print a memory map such as "AAAA....BBBBBBBBBB..CCCC" where dots are 
      * empty memory and names are repeated once for each MB allocated
-     * @param memory LinkedList<Process> representing allocated memory
+     * @param memory Queue<Process> representing allocated memory
      * @throws CloneNotSupportedException 
      */
-    public static void printMemoryMap(LinkedList<Process> memory, int time) throws CloneNotSupportedException
+    public static void printMemoryMap(Queue<Process> memory, int time) throws CloneNotSupportedException
     {
-        LinkedList<Process> memcopy = copyQueue(memory);
+        Queue<Process> memcopy = copyQueue(memory);
         StringBuilder sb = new StringBuilder().append(time).append(":    ");
         
         for (Process p : memcopy)
@@ -152,15 +151,14 @@ public abstract class Swapper
                 sb.append(p.name);
         
         System.out.println(sb);
-    }        
-    
+    }    
     /**
      * Create a deep copy of q
-     * @param q LinkedList<Process> in FCFS scheduling order
+     * @param q Queue<Process> in FCFS scheduling order
      * @return A deep copy of q in the same order
      * @throws CloneNotSupportedException
      */
-    public static LinkedList<Process> copyQueue(LinkedList<Process> q) throws CloneNotSupportedException
+    public static Queue<Process> copyQueue(Queue<Process> q) throws CloneNotSupportedException
     {        
         LinkedList<Process> qcopy = new LinkedList<>();
         for (Process p : q)
