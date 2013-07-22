@@ -34,28 +34,27 @@ public abstract class Swapper
         Queue<Process>  waitingQueue = new LinkedList<>();
         LinkedList<Process> memory = new LinkedList<>();
         memory.add(new Process(0, MEMORY_SIZE_MB, '.', 0, 0));
-        
+        // memory index (-1 = unavailiable), number of processes swapped, and current time
         int memIndex = -1;
         int swapped = 0;
         int time = 0;
-        
+        // p = temporary Process to allocate memory to, running is running
         Process p = null;
         Process running = null;
         
         while (!q.isEmpty() || !waitingQueue.isEmpty())
         {            
             // Allow the running process to execute for 1 second
-            if (running != null && --running.time == 0)
+            if (running != null && --running.time <= 0)
             {
                 deallocateProcess(memory, time);
                 memory = mergeAdjacentFragmentedMemory(memory);
                 running = null;
             }
-            
             if (running == null && waitingQueue.peek() != null)
             {
                 running = waitingQueue.poll();
-                //--running.time;
+                --running.time;
             }
             
             // Allocate processes that have arrived and have memory available for them
@@ -65,25 +64,23 @@ public abstract class Swapper
                 p.start = time;
                 
                 if (running == null)
-                    running = p;
+                    running = (waitingQueue.peek() != null) ? waitingQueue.poll() : p;
                 else
                     waitingQueue.add(p);
                 
                 // Replace the available memory with p and a proportionally smaller available block
                 memIndex = getIndex(memory, p.size, memIndex);
                 Process available = memory.remove(memIndex);
-                available.size -= p.size;
                 memory.add(memIndex, p);
+                available.size -= p.size;
                 if (available.size > 0)
                     memory.add(memIndex + 1, available);
                 ++swapped;
             
                 // Print the memory map every time we swap memory
                 printMemoryMap(memory, time);
-            }
-            
-            if(++time > SwappingSimulator.SIM_TIME_MAX)
-                break;
+            }            
+            if(++time > SwappingSimulator.SIM_TIME_MAX) break;
             
             // Sleep for 100ms  (10x speedup over realtime)
             try {
@@ -108,7 +105,7 @@ public abstract class Swapper
                ConcurrentModificationExceptions while using iterator to modify, and 
                Java does not give direct access to the list pointers for manual traversal
              */
-            if (p.name != '.' && p.time == 0)
+            if (p.name != '.' && p.time <= 0)
             {
                 memory.remove(i);
                 memory.add(i, new Process(0, p.size, '.', 0, 0));
@@ -144,7 +141,7 @@ public abstract class Swapper
     public static void printMemoryMap(Queue<Process> memory, int time) throws CloneNotSupportedException
     {
         Queue<Process> memcopy = copyQueue(memory);
-        StringBuilder sb = new StringBuilder().append(time).append(":    ");
+        StringBuilder sb = new StringBuilder().append(String.format("%-2d:    ", time));
         
         for (Process p : memcopy)
             while (p.size-- > 0)

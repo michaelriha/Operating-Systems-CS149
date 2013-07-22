@@ -58,7 +58,10 @@ public class ProcessFactory
             processQueue.addLast(new Process(time, size, 
                     NAMES.charAt(processNumber % NAMES.length()), arrival, arrival));
             ++processNumber;
-            arrival += (r.nextInt(PROCESS_TIME_MAX) + 1) / 2;
+            
+            // cluster more arrivals at the start so the job queue is busy
+            if (processNumber > 4)
+                arrival += r.nextInt(PROCESS_TIME_MAX) / 2;
         }
         return processQueue;
     }
